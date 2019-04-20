@@ -1,0 +1,64 @@
+*ripgrep.txt*          ripgrep plugin for Vim version 8.1
+
+                    SHORT REFERENCE MANUAL FOR VIM-ripgrep
+==============================================================================
+CONTENTS                                                     *ripgrep-contents*
+
+Introduction.............................................|ripgrep-introduction|
+Install.......................................................|ripgrep-install|
+Settings.....................................................|ripgrep-settings|
+Mappings.....................................................|ripgrep-mappings|
+Quickfix.....................................................|ripgrep-quickfix|
+
+==============================================================================
+INTRODUCTION                                             *ripgrep-introduction*
+
+This plugin provides ripgrep integration for Vim.
+
+Grab the latest version or report a bug on GitHub:
+http://github.com/mattia72/vim-ripgrep
+
+==============================================================================
+INSTALL                                                       *ripgrep-install*
+
+Copy the included directories into your .vim or vimfiles directory.
+Or even better, use |vim-plug| and simply put this line after your 
+|Plug| list in your .vimrc: >
+  Plug 'mattia72/vim-ripgrep'
+>
+That's all.
+
+==============================================================================
+SETTINGS                                                     *ripgrep-settings*
+
+There is no settings yet.
+
+==============================================================================
+MAPPINGS                                                     *ripgrep-mappings*
+
+The plugin defines no mappings but here are some suggestions: >
+
+  " ripgrep in current file
+  nnoremap <leader>rf <ESC>:RipGrep  %<Left><Left>
+  " ripgrep in current directory
+  nnoremap <leader>rd <ESC>:RipGrep 
+
+  " find all word under cursor in the current file 
+  nnoremap <leader>fa <ESC>:RipGrep -w <C-R><C-W> %<Left><Left>
+  " find all word under cursor in the current directory
+  nnoremap <leader>fA <ESC>:RipGrep -w <C-R><C-W> 
+
+  " find all selected in the current file 
+  vnoremap <leader>fa y<ESC>:RipGrep <C-R>0 %<Left><Left>
+  " find all selected in the current directory 
+  vnoremap <leader>fA y<ESC>:RipGrep <C-R>0
+
+==============================================================================
+QUICKFIX                                                     *ripgrep-quickfix*
+
+If ripgrep found some matches, the plugin opens the *quickfix* window 
+automatically and highlights the matched text with 
+	*Error		syntax group.
+
+------------------------------------------------------------------------------
+ vim:tw=79:ts=8:ft=help:norl:
