@@ -1,6 +1,6 @@
 # vim-ripgrep  
 
-A VIM plugin for ripgrep integration
+A VIM plugin for ripgrep integration, with highlighted matches in quickfix window.
 
 ![Screenshot](/../screenshot/screenshots/ripgrep.png?raw=true "Screenshot")
 

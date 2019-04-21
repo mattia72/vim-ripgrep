@@ -58,6 +58,7 @@ endif
 " ----------------------
 " Autocommands
 " ----------------------
+
 augroup vim_ripgrep_global_command_group
   autocmd!
   autocmd FileType qf call g:SetQuickFixWindowProperties() 
@@ -80,7 +81,6 @@ function! g:GrepPostActions()
   "TODO better info about searched pathes
   call setqflist([], 'a', {'title' : 'RipGrep'})
   let cmd = 'copen | match Error '
-
   if exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
     "ignore case
     if index(g:ripgrep_parameters, '"-i"') != -1 
@@ -119,7 +119,6 @@ function! RipGrep(...)
   endwhile
   " now join from the beginning
   for p in g:ripgrep_parameters | let cmd .= ' ' . p | endfor
-
   "echom 'RipGrep run: ' . cmd
 	echohl ModeMsg | echo 'RipGrep: '.substitute(cmd,'silent grep! ','rg','') | echohl None
   execute cmd
@@ -127,9 +126,8 @@ endfunction
 
 function! EchoResultMsg()
   let qflist = getqflist()
-
   if len(qflist) > 0
-	  echohl ModeMsg | echo 'RipGrep: '.len(qflist).' matches found.' | echohl None
+	  echohl ModeMsg | echo 'RipGrep: '.len(qflist).' matches found in '.join(g:ripgrep_search_path,', ') | echohl None
   else
     if len(g:ripgrep_search_path) > 0
       echohl WarningMsg | echo 'RipGrep: No match found in '.join(g:ripgrep_search_path,', ') | echohl None
@@ -142,12 +140,12 @@ endfunction
 " ----------------------
 " Commands
 " ----------------------
+
 command! -nargs=+ -complete=file RipGrep call RipGrep(<f-args>) | cwindow | call EchoResultMsg()
 
 " ----------------------
-" Mappings
+" TODO Mappings
 " ----------------------
-
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
