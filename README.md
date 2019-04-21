@@ -2,7 +2,7 @@
 
 A VIM plugin for ripgrep integration
 
-![Screenshot](/../screenshots/ripgrep.png?raw=true "Screenshot")
+![Screenshot](/../screenshot/screenshots/ripgrep.png?raw=true "Screenshot")
 
 See also [doc/ripgrep.txt](http://raw.github.com/mattia72/vim-ripgrep/master/doc/ripgrep.txt)
 for detailed documentation.
