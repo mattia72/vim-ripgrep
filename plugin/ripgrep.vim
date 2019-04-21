@@ -36,6 +36,11 @@ elseif v:version < 700
   finish
 endif
 
+if (!executable('rg')) 
+  echoerr 'vim-ripgrep couldn''t find rg executable.'
+  finish
+endif
+
 let g:loaded_vim_ripgrep = 1
 
 let s:save_cpo = &cpo
@@ -44,6 +49,11 @@ set cpo&vim
 " ----------------------
 " Global options 
 " ----------------------
+
+if (&grepprg !~# "^rg")
+  " it fails on second load so we set it only if it has not been set already
+  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+endif
 
 " ----------------------
 " Autocommands
@@ -111,19 +121,32 @@ function! RipGrep(...)
   for p in g:ripgrep_parameters | let cmd .= ' ' . p | endfor
 
   "echom 'RipGrep run: ' . cmd
-	echohl ModeMsg | echo 'RipGrep'.substitute(cmd,'silent grep!','','') | echohl None
+	echohl ModeMsg | echo 'RipGrep: '.substitute(cmd,'silent grep! ','rg','') | echohl None
   execute cmd
+endfunction
+
+function! EchoResultMsg()
+  let qflist = getqflist()
+
+  if len(qflist) > 0
+	  echohl ModeMsg | echo 'RipGrep: '.len(qflist).' matches found.' | echohl None
+  else
+    if len(g:ripgrep_search_path) > 0
+      echohl WarningMsg | echo 'RipGrep: No match found in '.join(g:ripgrep_search_path,', ') | echohl None
+    else
+      echohl WarningMsg | echo 'RipGrep: No match found in '.getcwd() | echohl None
+    endif
+  endif
 endfunction
 
 " ----------------------
 " Commands
 " ----------------------
-command! -nargs=+ -complete=file RipGrep call RipGrep(<f-args>) | cwindow 
+command! -nargs=+ -complete=file RipGrep call RipGrep(<f-args>) | cwindow | call EchoResultMsg()
 
 " ----------------------
 " Mappings
 " ----------------------
-
 
 
 let &cpo = s:save_cpo
