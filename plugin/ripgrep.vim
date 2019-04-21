@@ -30,7 +30,7 @@ scriptencoding utf-8
 
 " Preprocessing
 if exists('g:loaded_vim_ripgrep')
-  finish
+  "finish
 elseif v:version < 700
   echoerr 'vim-ripgrep does not work this version of Vim "' . v:version . '".'
   finish
@@ -126,14 +126,15 @@ endfunction
 
 function! EchoResultMsg()
   let qflist = getqflist()
-  if len(qflist) > 0
-	  echohl ModeMsg | echo 'RipGrep: '.len(qflist).' matches found in '.join(g:ripgrep_search_path,', ') | echohl None
+  if len(g:ripgrep_search_path) > 0
+    let search_path = join(g:ripgrep_search_path,', ') 
   else
-    if len(g:ripgrep_search_path) > 0
-      echohl WarningMsg | echo 'RipGrep: No match found in '.join(g:ripgrep_search_path,', ') | echohl None
-    else
-      echohl WarningMsg | echo 'RipGrep: No match found in '.getcwd() | echohl None
-    endif
+    let search_path = getcwd()
+  endif
+  if len(qflist) > 0
+	  echohl ModeMsg | echo 'RipGrep: '.len(qflist).' matches found in '.search_path | echohl None
+  else
+    echohl WarningMsg | echo 'RipGrep: No match found in '.search_path | echohl None
   endif
 endfunction
 
