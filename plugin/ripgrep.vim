@@ -61,8 +61,8 @@ endif
 
 augroup vim_ripgrep_global_command_group
   autocmd!
-  autocmd FileType qf call g:SetQuickFixWindowProperties() 
-  autocmd QuickFixCmdPost grep call g:GrepPostActions() 
+  autocmd FileType qf call ripgrep#SetQuickFixWindowProperties() 
+  autocmd QuickFixCmdPost grep call ripgrep#GrepPostActions() 
   " close with q or esc
   autocmd FileType qf if mapcheck('<esc>', 'n') ==# '' | nnoremap <buffer><silent> <esc> :cclose<bar>lclose<CR> | endif
   autocmd FileType qf nnoremap <buffer><silent> q :cclose<bar>lclose<CR>
@@ -73,13 +73,13 @@ augroup END
 " Functions
 " ----------------------
 
-function! g:SetQuickFixWindowProperties()
+function! g:ripgrep#SetQuickFixWindowProperties()
   set nocursorcolumn cursorline
 endfunction
 
-function! g:GrepPostActions()
+function! g:ripgrep#GrepPostActions()
   "TODO better info about searched pathes
-  call setqflist([], 'a', {'title' : 'RipGrep'})
+  "call setqflist([], 'a', {'title' : 'RipGrep'})
   let cmd = 'copen | match Error '
   if exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
     "ignore case
@@ -94,7 +94,7 @@ function! g:GrepPostActions()
   endif            
 endfunction
 
-function! RipGrep(...)
+function! g:ripgrep#RipGrep(...)
   let cmd = 'silent grep! '
   let i = a:0 - 1
   let is_path = 1
@@ -142,7 +142,7 @@ endfunction
 " Commands
 " ----------------------
 
-command! -nargs=+ -complete=file RipGrep call RipGrep(<f-args>) | cwindow | call EchoResultMsg()
+command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>) | cwindow | call EchoResultMsg()
 
 " ----------------------
 " TODO Mappings
