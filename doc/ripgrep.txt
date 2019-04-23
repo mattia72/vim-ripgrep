@@ -33,13 +33,15 @@ That's all.
 ==============================================================================
 SETTINGS                                                     *ripgrep-settings*
 
-The plugin sets *grepprg* to use *rg* as search tool.
+The plugin sets *grepprg* to use *rg* as search tool with this parameters: >
+  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+
 There is no other settings yet.
 
 ==============================================================================
 RIPGREP COMMAND                                               *ripgrep-command*
 
-:RipGrep {options} {pattern} {path} ...
+:RipGrep [{options}] {pattern} [{path} ...]
                     Search for {pattern} in the path {path} ... and set
                     the error list to the matches. 
                     You can find detailed description about the options in
@@ -68,16 +70,21 @@ The plugin defines no mappings but here are some suggestions: >
 ==============================================================================
 QUICKFIX                                                     *ripgrep-quickfix*
 
+The *quickfix* window opened by |vim-ripgrep| is placed most bottom, using the
+full width of the screen and it can be closed by pushing <esc> or <q>.
+
 If ripgrep found some matches, the plugin opens the *quickfix* window 
 automatically and highlights the matched text with 
 	*Error		syntax group.
-Note: How it looks like, see ":h group-name"
+
+Note: How the other groups look like, see >
+  :h group-name
 
 ==============================================================================
 RG HELP                                                       *ripgrep-rg-help*
 
 For better searching within Vim, here is a copy of the output of >
-  :!rg --help
+  :r !rg --help
 
 -----------------------------------------------------------------------------
 ripgrep 0.10.0
