@@ -50,10 +50,12 @@ set cpo&vim
 " Global options 
 " ----------------------
 
-if (&grepprg !~# "^rg")
-  " it fails on second load so we set it only if it has not been set already
-  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
-endif
+" if grepprg settings fails with "unknown option...", set isfname& could help...
+let s:save_isfname = &isfname
+set isfname&
+set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+let &isfname = s:save_isfname
+unlet s:save_isfname
 
 " ----------------------
 " Autocommands
@@ -62,7 +64,7 @@ endif
 augroup vim_ripgrep_global_command_group
   autocmd!
   autocmd FileType qf call ripgrep#SetQuickFixWindowProperties() 
-  autocmd QuickFixCmdPost grep call ripgrep#GrepPostActions() 
+  autocmd QuickFixCmdPost grep call ripgrep#GrepPostActions(1) 
   " close with q or esc
   autocmd FileType qf if mapcheck('<esc>', 'n') ==# '' | nnoremap <buffer><silent> <esc> :cclose<bar>lclose<CR> | endif
   autocmd FileType qf nnoremap <buffer><silent> q :cclose<bar>lclose<CR>
@@ -75,13 +77,18 @@ augroup END
 
 function! g:ripgrep#SetQuickFixWindowProperties()
   set nocursorcolumn cursorline
+	let prev_cmd = getqflist({'title' : 1})['title']
+	if (prev_cmd =~ '^:rg')
+    " highlight searched in reopened qf window
+    call ripgrep#GrepPostActions(0)
+	endif
 endfunction
 
-function! g:ripgrep#GrepPostActions()
-  "TODO better info about searched pathes
-  "call setqflist([], 'a', {'title' : 'RipGrep'})
-  let cmd = 'copen | match Error '
+function! g:ripgrep#GrepPostActions(with_copen)
   if exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
+    let cmd = ''
+    if a:with_copen | let cmd .= 'copen|' | endif
+    let cmd .= 'match Error '
     "ignore case
     if index(g:ripgrep_parameters, '"-i"') != -1 
       let cmd = ''.cmd.shellescape('\c'.trim(g:ripgrep_search_pattern,'"'))
@@ -142,6 +149,13 @@ endfunction
 " Commands
 " ----------------------
 
+if (exists(':AsyncDo'))
+command! -bang -nargs=* -complete=file AsyncRipGrep call asyncdo#run(
+      \ <bang>0,
+      \ { 'job': &grepprg,
+      \   'errorformat': &grepformat },
+      \ <f-args> )
+endif
 command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>) | cwindow | call EchoResultMsg()
 
 " ----------------------
