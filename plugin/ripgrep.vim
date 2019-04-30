@@ -96,7 +96,7 @@ function! g:ripgrep#GrepPostActions(with_copen)
       let cmd = ''.cmd.g:ripgrep_search_pattern
     endif
     "let @/ = trim(g:ripgrep_search_pattern,'"')
-    echom 'execute:'.cmd
+    "echom 'execute:'.cmd
     execute cmd
   endif            
 endfunction
