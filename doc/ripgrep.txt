@@ -8,6 +8,7 @@ Introduction.............................................|ripgrep-introduction|
 Install.......................................................|ripgrep-install|
 Settings.....................................................|ripgrep-settings|
 RipGrep command...............................................|ripgrep-command|
+RipGrep examples..............................................|ripgrep-command|
 Mappings.....................................................|ripgrep-mappings|
 Quickfix.....................................................|ripgrep-quickfix|
 Rg help.......................................................|ripgrep-rg-help|
@@ -46,6 +47,20 @@ RIPGREP COMMAND                                               *ripgrep-command*
                     the error list to the matches. 
                     You can find detailed description about the options in
                     the last section of this document *ripgrep-rg-help*
+
+Other commands can be defined for searching in specified dierectories, like 
+this: >
+  command! -nargs=+ -complete=file RipGrepInDir1AndDir2 
+    \ call ripgrep#RipGrep('-g', '!*/_*', '-g', '*.ext', <f-args>, dir1, dir2) 
+    \ | cwindow | call EchoResultMsg()
+The above command searches in files with *.ext extension in "dir1" and "dir2" but 
+not in directories with "_" prefix.
+
+==============================================================================
+RIPGREP EXAMPLES                                             *ripgrep-examples*
+
+Spaces should be escaped: >
+  :RipGrep word\ word
 
 ==============================================================================
 MAPPINGS                                                     *ripgrep-mappings*
