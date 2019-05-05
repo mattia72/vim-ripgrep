@@ -80,7 +80,7 @@ endfunction
 
 " it runs only after grep
 function! g:ripgrep#HighlightMatched()
-  echom 'Highlight...'
+  "echom 'Highlight...'
   call ripgrep#SetQuickFixWindowProperties()
   
  	let qf_cmd = getqflist({'title' : 1})['title']
@@ -91,11 +91,9 @@ function! g:ripgrep#HighlightMatched()
     if index(g:ripgrep_parameters, '"-i"') != -1 
       let cmd .= '"\c'.trim(ripgrep#ReEscape(g:ripgrep_search_pattern),'"').'"'
     else     
-      "let cmd .= shellescape(g:ripgrep_search_pattern, 1)
       let cmd .= ripgrep#ReEscape(g:ripgrep_search_pattern)
     endif
-    "let @/ = trim(g:ripgrep_search_pattern,'"')
-    echom 'HighligtMatched execute:'.cmd
+    "echom 'HighligtMatched execute:'.cmd
     execute cmd
   endif            
 endfunction
