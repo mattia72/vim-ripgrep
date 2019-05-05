@@ -57,22 +57,10 @@ set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
 let &isfname = s:save_isfname
 unlet s:save_isfname
 
-" ----------------------
-" Autocommands
-" ----------------------
-
-augroup vim_ripgrep_global_command_group
-  autocmd!
-  autocmd FileType qf call ripgrep#SetQuickFixWindowProperties() 
-
-  "we don't need this because of FyleType
-  "autocmd QuickFixCmdPost grep call ripgrep#HighlightMatched(1) 
-  
-  " close with q or esc
-  autocmd FileType qf if mapcheck('<esc>', 'n') ==# '' | nnoremap <buffer><silent> <esc> :cclose<bar>lclose<CR> | endif
-  autocmd FileType qf nnoremap <buffer><silent> q :cclose<bar>lclose<CR>
-  autocmd QuickFixCmdPost * copen 8 | wincmd J
-augroup END
+set grepformat=%f:%l:%c:%m
+"TODO regex parse errors...
+"set grepformat+=%E%.%#error:
+"set grepformat+=%C%.%#
 
 " ----------------------
 " Functions
@@ -80,24 +68,25 @@ augroup END
 
 function! g:ripgrep#SetQuickFixWindowProperties()
   set nocursorcolumn cursorline
-	let qf_cmd = getqflist({'title' : 1})['title']
-	if (qf_cmd =~ '^:rg')
-    " highlight searched in reopened qf window
-    call ripgrep#HighlightMatched()
-	endif
 endfunction
 
 function! g:ripgrep#ReEscape(pattern)
-  return substitute(a:pattern,'\\\\\([#%]\)',{m -> m[1]}, 'g')
+  " \% and \# --> % and #
+  let ret_str = substitute(a:pattern,'\\\\\([#%]\)',{m -> m[1]}, 'g')
+  " + and ? --> \+ and \?
+  let ret_str = substitute(ret_str,'\([+?]\)',{m -> "\\".m[1]}, 'g')
+  return ret_str
 endfunction
 
+" it runs only after grep
 function! g:ripgrep#HighlightMatched()
-  if exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
-    let cmd = ''
-    "if a:with_copen 
-      "let cmd .= 'copen|' 
-    "endif
-    let cmd .= 'match Error '
+  echom 'Highlight...'
+  call ripgrep#SetQuickFixWindowProperties()
+  
+ 	let qf_cmd = getqflist({'title' : 1})['title']
+
+  if qf_cmd =~ '^:\?\(AsyncRun\)\?\s\?rg' && exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
+    let cmd = 'match Error '
     "ignore case
     if index(g:ripgrep_parameters, '"-i"') != -1 
       let cmd .= '"\c'.trim(ripgrep#ReEscape(g:ripgrep_search_pattern),'"').'"'
@@ -106,13 +95,12 @@ function! g:ripgrep#HighlightMatched()
       let cmd .= ripgrep#ReEscape(g:ripgrep_search_pattern)
     endif
     "let @/ = trim(g:ripgrep_search_pattern,'"')
-    "echom 'execute:'.cmd
+    echom 'HighligtMatched execute:'.cmd
     execute cmd
   endif            
 endfunction
 
-function! g:ripgrep#RipGrep(...)
-  let cmd = 'silent grep! '
+function! g:ripgrep#ReadParams(...)
   let i = a:0 - 1
   let is_path = 1
   let g:ripgrep_parameters = []
@@ -134,6 +122,17 @@ function! g:ripgrep#RipGrep(...)
     endif
     let i -= 1
   endwhile
+  if len(g:ripgrep_search_path) == 0
+    call add(g:ripgrep_parameters, '.')
+  endif
+  let params = ''
+  for p in g:ripgrep_parameters | let params .= trim(p,'"').' ' | endfor
+  "for p in g:ripgrep_parameters | let params .= p.' ' | endfor
+  return params
+endfunction
+
+function! g:ripgrep#RipGrep()
+  let cmd = 'silent grep! '
   " now join from the beginning
   for p in g:ripgrep_parameters | let cmd .= ' ' . p | endfor
   "echom 'RipGrep run: ' . cmd
@@ -150,24 +149,37 @@ function! ripgrep#EchoResultMsg()
   endif
   if len(qflist) > 0
 	  echohl ModeMsg | echo 'RipGrep: '.len(qflist).' matches found in '.search_path | echohl None
+	  " so we get info about parsing errors...
+	  copen
   else
     echohl WarningMsg | echo 'RipGrep: No match found in '.search_path | echohl None
   endif
 endfunction
 
 " ----------------------
+" Autocommands
+" ----------------------
+
+augroup vim_ripgrep_global_command_group
+  autocmd!
+  autocmd QuickFixCmdPost grep call ripgrep#HighlightMatched() 
+  autocmd QuickFixCmdPost grep copen 8 | wincmd J
+
+  " close with q or esc
+  autocmd FileType qf if mapcheck('<esc>', 'n') ==# '' | nnoremap <buffer><silent> <esc> :cclose<bar>lclose<CR> | endif
+  autocmd FileType qf if mapcheck('q', 'n') ==# '' | nnoremap <buffer><silent> q :cclose<bar>lclose<CR>
+augroup END
+
+" ----------------------
 " Commands
 " ----------------------
 
-if (exists(':AsyncDo'))
-command! -bang -nargs=* -complete=file AsyncRipGrep call asyncdo#run(
-      \ <bang>0,
-      \ { 'job': &grepprg,
-      \   'errorformat': &grepformat },
-      \ <f-args> )
+if (exists(':AsyncRun'))
+  command! -bang -nargs=+ -range=0 -complete=file AsyncRipGrep
+	      \ execute 'AsyncRun -post=silent\ doautocmd\ QuickFixCmdPost\ grep -program=grep @ '.ripgrep#ReadParams(<f-args>)
 endif
 
-command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>) | cwindow | call ripgrep#EchoResultMsg()
+command! -nargs=+ -complete=file RipGrep call ripgrep#ReadParams(<f-args>) | call ripgrep#RipGrep() | call ripgrep#EchoResultMsg()
 
 " ----------------------
 " TODO Mappings
