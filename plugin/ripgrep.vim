@@ -30,7 +30,7 @@ scriptencoding utf-8
 
 " Preprocessing
 if exists('g:loaded_vim_ripgrep')
-  "finish
+  finish
 elseif v:version < 700
   echoerr 'vim-ripgrep does not work this version of Vim "' . v:version . '".'
   finish
@@ -64,7 +64,10 @@ unlet s:save_isfname
 augroup vim_ripgrep_global_command_group
   autocmd!
   autocmd FileType qf call ripgrep#SetQuickFixWindowProperties() 
-  autocmd QuickFixCmdPost grep call ripgrep#GrepPostActions(1) 
+
+  "we don't need this because of FyleType
+  "autocmd QuickFixCmdPost grep call ripgrep#HighlightMatched(1) 
+  
   " close with q or esc
   autocmd FileType qf if mapcheck('<esc>', 'n') ==# '' | nnoremap <buffer><silent> <esc> :cclose<bar>lclose<CR> | endif
   autocmd FileType qf nnoremap <buffer><silent> q :cclose<bar>lclose<CR>
@@ -77,23 +80,30 @@ augroup END
 
 function! g:ripgrep#SetQuickFixWindowProperties()
   set nocursorcolumn cursorline
-	let prev_cmd = getqflist({'title' : 1})['title']
-	if (prev_cmd =~ '^:rg')
+	let qf_cmd = getqflist({'title' : 1})['title']
+	if (qf_cmd =~ '^:rg')
     " highlight searched in reopened qf window
-    call ripgrep#GrepPostActions(0)
+    call ripgrep#HighlightMatched()
 	endif
 endfunction
 
-function! g:ripgrep#GrepPostActions(with_copen)
+function! g:ripgrep#ReEscape(pattern)
+  return substitute(a:pattern,'\\\\\([#%]\)',{m -> m[1]}, 'g')
+endfunction
+
+function! g:ripgrep#HighlightMatched()
   if exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
     let cmd = ''
-    if a:with_copen | let cmd .= 'copen|' | endif
+    "if a:with_copen 
+      "let cmd .= 'copen|' 
+    "endif
     let cmd .= 'match Error '
     "ignore case
     if index(g:ripgrep_parameters, '"-i"') != -1 
-      let cmd = ''.cmd.shellescape('\c'.trim(g:ripgrep_search_pattern,'"'))
+      let cmd .= '"\c'.trim(ripgrep#ReEscape(g:ripgrep_search_pattern),'"').'"'
     else     
-      let cmd = ''.cmd.g:ripgrep_search_pattern
+      "let cmd .= shellescape(g:ripgrep_search_pattern, 1)
+      let cmd .= ripgrep#ReEscape(g:ripgrep_search_pattern)
     endif
     "let @/ = trim(g:ripgrep_search_pattern,'"')
     "echom 'execute:'.cmd
@@ -116,7 +126,7 @@ function! g:ripgrep#RipGrep(...)
       call insert(g:ripgrep_search_path, expand(a:000[i]))
     else " else search string
       if pattern_set == 0 
-        let g:ripgrep_search_pattern = shellescape(a:000[i])
+        let g:ripgrep_search_pattern = shellescape(a:000[i], 1)
         let pattern_set = 1
       endif
       call insert(g:ripgrep_parameters, shellescape(a:000[i]))
@@ -131,7 +141,7 @@ function! g:ripgrep#RipGrep(...)
   execute cmd
 endfunction
 
-function! EchoResultMsg()
+function! ripgrep#EchoResultMsg()
   let qflist = getqflist()
   if len(g:ripgrep_search_path) > 0
     let search_path = join(g:ripgrep_search_path,', ') 
@@ -156,7 +166,8 @@ command! -bang -nargs=* -complete=file AsyncRipGrep call asyncdo#run(
       \   'errorformat': &grepformat },
       \ <f-args> )
 endif
-command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>) | cwindow | call EchoResultMsg()
+
+command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>) | cwindow | call ripgrep#EchoResultMsg()
 
 " ----------------------
 " TODO Mappings

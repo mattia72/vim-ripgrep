@@ -59,8 +59,10 @@ not in directories with "_" prefix.
 ==============================================================================
 RIPGREP EXAMPLES                                             *ripgrep-examples*
 
-Spaces should be escaped: >
-  :RipGrep word\ word
+Space, '%' and '#' should be escaped. 
+For example: if you want to search "WORD hash# percent%", you have to type: >
+  :RipGrep WORD\ hash\\#\ percent\\%
+
 
 ==============================================================================
 MAPPINGS                                                     *ripgrep-mappings*
