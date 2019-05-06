@@ -78,7 +78,7 @@ function! g:ripgrep#ReEscape(pattern)
   return ret_str
 endfunction
 
-" it runs only after grep
+" it should run only after grep
 function! g:ripgrep#HighlightMatched()
   "echom 'Highlight...'
   call ripgrep#SetQuickFixWindowProperties()
@@ -86,12 +86,13 @@ function! g:ripgrep#HighlightMatched()
  	let qf_cmd = getqflist({'title' : 1})['title']
 
   if qf_cmd =~ '^:\?\(AsyncRun\)\?\s\?rg' && exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
-    let cmd = 'match Error '
+    "don't match before second |
+    let cmd = 'match Error "^.*|.*|.*\zs' 
     "ignore case
     if index(g:ripgrep_parameters, '"-i"') != -1 
-      let cmd .= '"\c'.trim(ripgrep#ReEscape(g:ripgrep_search_pattern),'"').'"'
+      let cmd .= '\c'.trim(ripgrep#ReEscape(g:ripgrep_search_pattern),'"').'"'
     else     
-      let cmd .= ripgrep#ReEscape(g:ripgrep_search_pattern)
+      let cmd .= trim(ripgrep#ReEscape(g:ripgrep_search_pattern),'"').'"'
     endif
     "echom 'HighligtMatched execute:'.cmd
     execute cmd
@@ -145,7 +146,9 @@ function! ripgrep#EchoResultMsg()
   else
     let search_path = getcwd()
   endif
-  if len(qflist) > 0
+
+ 	let qf_size = getqflist({'size' : 1})['size']
+  if qf_size > 0
 	  echohl ModeMsg | echo 'RipGrep: '.len(qflist).' matches found in '.search_path | echohl None
 	  " so we get info about parsing errors...
 	  copen
@@ -160,7 +163,7 @@ endfunction
 
 augroup vim_ripgrep_global_command_group
   autocmd!
-  autocmd QuickFixCmdPost grep call ripgrep#HighlightMatched() 
+  autocmd FileType qf call ripgrep#HighlightMatched() 
   autocmd QuickFixCmdPost grep copen 8 | wincmd J
 
   " close with q or esc
@@ -173,11 +176,12 @@ augroup END
 " ----------------------
 
 if (exists(':AsyncRun'))
-  command! -bang -nargs=+ -range=0 -complete=file AsyncRipGrep
-	      \ execute 'AsyncRun -post=silent\ doautocmd\ QuickFixCmdPost\ grep -program=grep @ '.ripgrep#ReadParams(<f-args>)
+  command! -bang -nargs=+ -range=0 -complete=file RipGrepAsync
+	    \ execute 'AsyncRun -program=grep @ '.ripgrep#ReadParams(<f-args>)
 endif
 
-command! -nargs=+ -complete=file RipGrep call ripgrep#ReadParams(<f-args>) | call ripgrep#RipGrep() | call ripgrep#EchoResultMsg()
+command! -nargs=+ -complete=file RipGrep 
+      \ call ripgrep#ReadParams(<f-args>) | call ripgrep#RipGrep() | call ripgrep#EchoResultMsg()
 
 " ----------------------
 " TODO Mappings
