@@ -30,7 +30,7 @@ scriptencoding utf-8
 
 " Preprocessing
 if exists('g:loaded_vim_ripgrep')
-  "finish
+  finish
 elseif v:version < 700
   echoerr 'vim-ripgrep does not work this version of Vim "' . v:version . '".'
   finish
