@@ -30,7 +30,7 @@ scriptencoding utf-8
 
 " Preprocessing
 if exists('g:loaded_vim_ripgrep')
-  finish
+  "finish
 elseif v:version < 700
   echoerr 'vim-ripgrep does not work this version of Vim "' . v:version . '".'
   finish
@@ -53,7 +53,8 @@ set cpo&vim
 " if grepprg settings fails with "unknown option...", set isfname& could help...
 let s:save_isfname = &isfname
 set isfname&
-set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+"set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+set grepprg=rg\ --vimgrep\ --smart-case
 let &isfname = s:save_isfname
 unlet s:save_isfname
 
@@ -129,6 +130,7 @@ function! g:ripgrep#ReadParams(...)
   for p in g:ripgrep_parameters | let params .= trim(p,'"').' ' | endfor
   "for p in g:ripgrep_parameters | let params .= p.' ' | endfor
 
+	echohl ModeMsg | echo 'RipGrep: rg '.params | echohl None
   return params
 endfunction
 
@@ -137,11 +139,11 @@ function! g:ripgrep#ExecRipGrep()
   " now join from the beginning
   for p in g:ripgrep_parameters | let cmd .= ' ' . p | endfor
   "echom 'RipGrep run: ' . cmd
-	echohl ModeMsg | echo 'RipGrep: '.substitute(cmd,'silent grep! ','rg','') | echohl None
+	"echohl ModeMsg | echo 'RipGrep: '.substitute(cmd,'silent grep! ','rg','') | echohl None
   execute cmd
 endfunction
 
-function! ripgrep#EchoResultMsg()
+function! ripgrep#EchoResultMsg(header_footer_line_count)
   let qflist = getqflist()
   if len(g:ripgrep_search_path) > 0
     let search_path = join(g:ripgrep_search_path,', ') 
@@ -149,9 +151,11 @@ function! ripgrep#EchoResultMsg()
     let search_path = getcwd()
   endif
 
- 	let qf_size = getqflist({'size' : 1})['size']
+ 	redraw
+
+ 	let qf_size = getqflist({'size' : 1})['size'] - a:header_footer_line_count
   if qf_size > 0
-	  echohl ModeMsg | echo 'RipGrep: '.len(qflist).' matches found in '.search_path | echohl None
+	  echohl ModeMsg | echo 'RipGrep: '.qf_size.' matches found in '.search_path | echohl None
 	  " so we get info about parsing errors...
 	  copen
   else
@@ -163,6 +167,7 @@ function! g:ripgrep#RipGrep(...)
   " this is weird, but the args are so ok
   call call('ripgrep#ReadParams', a:000)
   call ripgrep#ExecRipGrep()  
+  call ripgrep#EchoResultMsg(0)
 endfunction
 
 " ----------------------
@@ -185,7 +190,7 @@ augroup END
 
 if (exists(':AsyncRun'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrepAsync
-	    \ execute 'AsyncRun'.<bang>.' -auto=grep -program=grep @ '.ripgrep#ReadParams(<f-args>)
+	      \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.ripgrep#ReadParams(<f-args>)
 endif
 
 command! -nargs=+ -complete=file RipGrep 
