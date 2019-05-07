@@ -30,7 +30,7 @@ scriptencoding utf-8
 
 " Preprocessing
 if exists('g:loaded_vim_ripgrep')
-  finish
+  "finish
 elseif v:version < 700
   echoerr 'vim-ripgrep does not work this version of Vim "' . v:version . '".'
   finish
@@ -86,8 +86,9 @@ function! g:ripgrep#HighlightMatched()
  	let qf_cmd = getqflist({'title' : 1})['title']
 
   if qf_cmd =~ '^:\?\(AsyncRun\)\?\s\?rg' && exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
+    " TODO more matches in one line?
     "don't match before second |
-    let cmd = 'match Error "^.*|.*|.*\zs' 
+    let cmd = 'match none | match Error "^.*|.*|.*\zs' 
     "ignore case
     if index(g:ripgrep_parameters, '"-i"') != -1 
       let cmd .= '\c'.trim(ripgrep#ReEscape(g:ripgrep_search_pattern),'"').'"'
@@ -127,10 +128,11 @@ function! g:ripgrep#ReadParams(...)
   let params = ''
   for p in g:ripgrep_parameters | let params .= trim(p,'"').' ' | endfor
   "for p in g:ripgrep_parameters | let params .= p.' ' | endfor
+
   return params
 endfunction
 
-function! g:ripgrep#RipGrep()
+function! g:ripgrep#ExecRipGrep()
   let cmd = 'silent grep! '
   " now join from the beginning
   for p in g:ripgrep_parameters | let cmd .= ' ' . p | endfor
@@ -157,6 +159,12 @@ function! ripgrep#EchoResultMsg()
   endif
 endfunction
 
+function! g:ripgrep#RipGrep(...)
+  " this is weird, but the args are so ok
+  call call('ripgrep#ReadParams', a:000)
+  call ripgrep#ExecRipGrep()  
+endfunction
+
 " ----------------------
 " Autocommands
 " ----------------------
@@ -177,11 +185,11 @@ augroup END
 
 if (exists(':AsyncRun'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrepAsync
-	    \ execute 'AsyncRun -program=grep @ '.ripgrep#ReadParams(<f-args>)
+	    \ execute 'AsyncRun'.<bang>.' -auto=grep -program=grep @ '.ripgrep#ReadParams(<f-args>)
 endif
 
 command! -nargs=+ -complete=file RipGrep 
-      \ call ripgrep#ReadParams(<f-args>) | call ripgrep#RipGrep() | call ripgrep#EchoResultMsg()
+      \ call ripgrep#RipGrep(<f-args>)
 
 " ----------------------
 " TODO Mappings
