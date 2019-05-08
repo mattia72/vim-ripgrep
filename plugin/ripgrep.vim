@@ -89,7 +89,7 @@ function! g:ripgrep#HighlightMatched()
   if qf_cmd =~ '^:\?\(AsyncRun\)\?\s\?rg' && exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
     " TODO more matches in one line?
     "don't match before second |
-    let cmd = 'match none | match Error "^.*|.*|.*\zs' 
+    let cmd = 'match none | match Error "^.\{-}|.\{-}|.*\zs' 
     "ignore case
     if index(g:ripgrep_parameters, '"-i"') != -1 
       let cmd .= '\c'.trim(ripgrep#ReEscape(g:ripgrep_search_pattern),'"').'"'
