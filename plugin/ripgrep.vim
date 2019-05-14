@@ -30,7 +30,7 @@ scriptencoding utf-8
 
 " Preprocessing
 if exists('g:loaded_vim_ripgrep')
-  "finish
+  finish
 elseif v:version < 700
   echoerr 'vim-ripgrep does not work this version of Vim "' . v:version . '".'
   finish
@@ -72,11 +72,31 @@ function! g:ripgrep#SetQuickFixWindowProperties()
 endfunction
 
 function! g:ripgrep#ReEscape(pattern)
+  "echom '"'.a:pattern.'"'
   " \% and \# --> % and #
   let ret_str = substitute(a:pattern,'\\\\\([#%]\)',{m -> m[1]}, 'g')
   " + and ? --> \+ and \?
   let ret_str = substitute(ret_str,'\([+?]\)',{m -> "\\".m[1]}, 'g')
+  " TODO support more then two word boundary
+  " \b --> \< 
+  let ret_str = substitute(ret_str,'\\b','\\<', '')
+  let ret_str = substitute(ret_str,'\\b','\\>', '')
+  " ^ --> ''
+  let ret_str = substitute(ret_str,'^\^','"', '')
+  "echom ret_str
   return ret_str
+endfunction
+
+function! g:ripgrep#BuildMatchCmd(regex, num)
+  let cmd = ''
+  let regex_prefix = '^.\{-}|.\{-}|'
+  if a:num == 1
+    let cmd = 'match Error "'.regex_prefix.'\(.\{-}'.a:regex.'\)\{'.a:num.'}"'
+  else
+    let cmd = a:num.'match Error "'.regex_prefix.'\(.\{-}'.a:regex.'\)\{'.a:num.'}"'
+  endif
+  "echom 'BuildMatchCmd :'.cmd
+  return cmd
 endfunction
 
 " it should run only after grep
@@ -87,17 +107,23 @@ function! g:ripgrep#HighlightMatched()
  	let qf_cmd = getqflist({'title' : 1})['title']
 
   if qf_cmd =~ '^:\?\(AsyncRun\)\?\s\?rg' && exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
-    " TODO more matches in one line?
     "don't match before second |
-    let cmd = 'match none | match Error "^.\{-}|.\{-}|.*\zs' 
+    let cmd = 'match none | match Error' 
+    let regex = ripgrep#ReEscape(trim(g:ripgrep_search_pattern,'"'))
+    if (g:ripgrep_search_pattern !~# '\\zs')
+      let regex = '\zs'.regex
+    endif
+    if (g:ripgrep_search_pattern !~# '\\ze')
+      let regex = regex.'\ze'
+    endif
     "ignore case
     if index(g:ripgrep_parameters, '"-i"') != -1 
-      let cmd .= '\c'.trim(ripgrep#ReEscape(g:ripgrep_search_pattern),'"').'"'
-    else     
-      let cmd .= trim(ripgrep#ReEscape(g:ripgrep_search_pattern),'"').'"'
+      let regex = '\c'.regex
     endif
-    "echom 'HighligtMatched execute:'.cmd
-    execute cmd
+    execute 'match none'
+    execute ripgrep#BuildMatchCmd(regex, 1)
+    execute ripgrep#BuildMatchCmd(regex, 2)
+    execute ripgrep#BuildMatchCmd(regex, 3)
   endif            
 endfunction
 
