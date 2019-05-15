@@ -30,7 +30,7 @@ scriptencoding utf-8
 
 " Preprocessing
 if exists('g:loaded_vim_ripgrep')
-  finish
+  "finish
 elseif v:version < 700
   echoerr 'vim-ripgrep does not work this version of Vim "' . v:version . '".'
   finish
@@ -135,16 +135,29 @@ function! g:ripgrep#ReadParams(...)
   let path_set=0
   let g:ripgrep_search_path = []
   while i >= 0
+    echom 'Rg param '.i.': '.a:000[i]
     " if last parameter is a file/directory
-    if !empty(glob(expand(a:000[i]))) && is_path == 1
-      call insert(g:ripgrep_parameters, shellescape(expand(a:000[i])))
-      call insert(g:ripgrep_search_path, expand(a:000[i]))
+
+    if is_path == 1 
+      let file_or_dir = glob(expand(a:000[i]))
+      if !empty(file_or_dir) && (isdirectory(file_or_dir) || filereadable(file_or_dir))
+        echom 'Rg param '.i.' is path:'.file_or_dir
+        call insert(g:ripgrep_parameters, shellescape(a:000[i]))
+        call insert(g:ripgrep_search_path, file_or_dir)
+      else
+        let is_path = 0
+        echom 'Rg param '.i.' is NOT path:'.file_or_dir
+        continue
+      endif
     else " else search string
       if pattern_set == 0 
-        let g:ripgrep_search_pattern = shellescape(a:000[i], 1)
+        let g:ripgrep_search_pattern = '"'.escape(a:000[i], '%#"').'"'
         let pattern_set = 1
+        call insert(g:ripgrep_parameters, g:ripgrep_search_pattern)
+        echom 'Rg pattern:'.g:ripgrep_search_pattern
+      else
+        call insert(g:ripgrep_parameters, shellescape(a:000[i]))
       endif
-      call insert(g:ripgrep_parameters, shellescape(a:000[i]))
       let is_path = 0
     endif
     let i -= 1
@@ -152,18 +165,21 @@ function! g:ripgrep#ReadParams(...)
   if len(g:ripgrep_search_path) == 0
     call add(g:ripgrep_parameters, '.')
   endif
+
   let params = ''
   for p in g:ripgrep_parameters | let params .= trim(p,'"').' ' | endfor
   "for p in g:ripgrep_parameters | let params .= p.' ' | endfor
 
+  echom 'Rg: '.params 
 	echohl ModeMsg | echo 'RipGrep: rg '.params | echohl None
+	" The return value goes to Async Command
   return params
 endfunction
 
 function! g:ripgrep#ExecRipGrep()
   let cmd = 'silent grep! '
   " now join from the beginning
-  for p in g:ripgrep_parameters | let cmd .= ' ' . p | endfor
+  for p in g:ripgrep_parameters | let cmd .= ' '.p | endfor
   "echom 'RipGrep run: ' . cmd
 	"echohl ModeMsg | echo 'RipGrep: '.substitute(cmd,'silent grep! ','rg','') | echohl None
   execute cmd
@@ -216,11 +232,10 @@ augroup END
 
 if (exists(':AsyncRun'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrepAsync
-	      \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.ripgrep#ReadParams(<f-args>)
+	      \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.escape(ripgrep#ReadParams(<f-args>),'#%"')
 endif
 
-command! -nargs=+ -complete=file RipGrep 
-      \ call ripgrep#RipGrep(<f-args>)
+command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
 
 " ----------------------
 " TODO Mappings
@@ -228,3 +243,21 @@ command! -nargs=+ -complete=file RipGrep
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
+
+" ----------------------
+" TODO Tests
+" ----------------------
+"
+"  Special characters
+"
+"ok :RipGrep ripgrep\#Echo %
+"ok :RipGrepAsync ripgrep\#Echo %
+"nok:RipGrep \#\% %
+
+"  Space...
+"
+"ok :RipGrep autocmd\ File %
+"nok:RipGrepAsync autocmd\ File %
+"
+"yank the next line to a register, then run with @<register>
+"0f:ly$:"
