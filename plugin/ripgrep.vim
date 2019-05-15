@@ -170,7 +170,6 @@ function! g:ripgrep#ExecRipGrep()
 endfunction
 
 function! ripgrep#EchoResultMsg(header_footer_line_count)
-  let qflist = getqflist()
   if len(g:ripgrep_search_path) > 0
     let search_path = join(g:ripgrep_search_path,', ') 
   else
@@ -179,7 +178,8 @@ function! ripgrep#EchoResultMsg(header_footer_line_count)
 
  	redraw
 
- 	let qf_size = getqflist({'size' : 1})['size'] - a:header_footer_line_count
+  let qflist = getqflist()
+ 	let qf_size = len(qflist) - a:header_footer_line_count
   if qf_size > 0
 	  echohl ModeMsg | echo 'RipGrep: '.qf_size.' matches found in '.search_path | echohl None
 	  " so we get info about parsing errors...

@@ -80,7 +80,7 @@ MAPPINGS                                                     *ripgrep-mappings*
 The plugin defines no mappings but here are some suggestions: >
 
   " ripgrep in current file
-  nnoremap <leader>rf <ESC>:RipGrep  %<Left><Left>
+  nnoremap <leader>rf <ESC>:RipGrep %<Left><Left>
   " ripgrep in current directory
   nnoremap <leader>rd <ESC>:RipGrepAsync 
 
