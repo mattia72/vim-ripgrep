@@ -151,24 +151,29 @@ function! g:ripgrep#ReadParams(...)
       endif
     else " else search string
       if pattern_set == 0 
-        let g:ripgrep_search_pattern = '"'.escape(a:000[i], '%#"').'"'
-        let pattern_set = 1
+        let g:ripgrep_search_pattern = '""'.escape(a:000[i], '%#"').'""'
         call insert(g:ripgrep_parameters, g:ripgrep_search_pattern)
         echom 'Rg pattern:'.g:ripgrep_search_pattern
-      else
+        let pattern_set = 1
+      else " else rg parameters
         call insert(g:ripgrep_parameters, shellescape(a:000[i]))
+        echom 'Rg param:'.g:ripgrep_parameters
       endif
       let is_path = 0
     endif
     let i -= 1
   endwhile
+
   if len(g:ripgrep_search_path) == 0
     call add(g:ripgrep_parameters, '.')
   endif
 
   let params = ''
-  for p in g:ripgrep_parameters | let params .= trim(p,'"').' ' | endfor
-  "for p in g:ripgrep_parameters | let params .= p.' ' | endfor
+  for p in g:ripgrep_parameters 
+    let param = substitute(p,'^"','','')
+    let param = substitute(p,'"$','','')
+    let params .= param.' ' 
+  endfor
 
   echom 'Rg: '.params 
 	echohl ModeMsg | echo 'RipGrep: rg '.params | echohl None
@@ -232,7 +237,7 @@ augroup END
 
 if (exists(':AsyncRun'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrepAsync
-	      \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.escape(ripgrep#ReadParams(<f-args>),'#%"')
+	      \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.escape(ripgrep#ReadParams(<f-args>),'#%')
 endif
 
 command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
