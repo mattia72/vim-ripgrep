@@ -8,7 +8,7 @@ INTRODUCTION.............................................|ripgrep-introduction|
 INSTALL.......................................................|ripgrep-install|
 SETTINGS.....................................................|ripgrep-settings|
 RIPGREP COMMAND...............................................|ripgrep-command|
-RIPGREP EXAMPLES..............................................|ripgrep-command|
+RIPGREP EXAMPLES.............................................|ripgrep-examples|
 MAPPINGS.....................................................|ripgrep-mappings|
 QUICKFIX.....................................................|ripgrep-quickfix|
 RG HELP.......................................................|ripgrep-rg-help|
@@ -39,7 +39,7 @@ That's all.
 SETTINGS                                                     *ripgrep-settings*
 
 The plugin sets *grepprg* to use *rg* as search tool with this parameters: >
-  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+  set grepprg=rg\ --vimgrep
 
 There is no other settings yet.
 
@@ -50,7 +50,7 @@ RIPGREP COMMAND                        *:RipGrep* *:RipGrepAsync* *ripgrep-comma
                     Search for {pattern} in the path {path} ... and set
                     the error list to the matches. 
                     You can find detailed description about the options in
-                    the last section of this document *ripgrep-rg-help*
+                    the last section of this document |ripgrep-rg-help|
 
 If you have installed |asynchrun| plugin, you will get an asynchron version of
 this command too:
@@ -70,8 +70,16 @@ not in directories with "_" prefix.
 RIPGREP EXAMPLES                                             *ripgrep-examples*
 
 Space, '%' and '#' should be escaped. 
-For example: if you want to search "WORD hash# percent%", you have to type: >
-  :RipGrep WORD\ hash\\#\ percent\\%
+For example: if you want to search 'WORD hash# percent%', in the current
+directory, you have to type: >
+  :RipGrep WORD\ hash\#\ percent\%
+
+Search for 'word' and ignore case in current buffer: >
+  :RipGrep -w -i word %
+
+Double quote '"' can be searched so without escaping: >
+  :RipGrep ^\s*"\ .* %
+Note: '"' will be converted to '\x22' internally, because of escaping issues
 
 
 ==============================================================================
