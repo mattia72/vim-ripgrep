@@ -77,10 +77,12 @@ directory, you have to type: >
 Search for 'word' and ignore case in current buffer: >
   :RipGrep -w -i word %
 
-Double quote '"' can be searched so without escaping: >
+Double quote '"' can be searched without escaping: >
   :RipGrep ^\s*"\ .* %
 Note: '"' will be converted to '\x22' internally, because of escaping issues
 
+Other encoding: >
+  :RipGrep -E latin1 Käuser
 
 ==============================================================================
 MAPPINGS                                                     *ripgrep-mappings*
