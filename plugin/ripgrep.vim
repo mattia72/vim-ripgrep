@@ -117,7 +117,7 @@ endfunction
 
 " it should run only after grep
 function! g:ripgrep#HighlightMatched()
-  "call ripgrep#echod('Highlight...')
+  call ripgrep#echod('Highlight...')
   call ripgrep#SetQuickFixWindowProperties()
   
  	let qf_cmd = getqflist({'title' : 1})['title']
@@ -267,11 +267,11 @@ augroup END
 " ----------------------
 
 if (exists(':AsyncRun'))
-  command! -bang -nargs=+ -range=0 -complete=file RipGrepAsync
+  command! -bang -nargs=+ -range=0 -complete=file RipGrep
 	      \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.escape(ripgrep#ReadParams(<f-args>),'#%')
+else
+  command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
 endif
-
-command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
 
 " ----------------------
 " TODO Mappings

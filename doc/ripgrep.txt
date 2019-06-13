@@ -44,7 +44,7 @@ The plugin sets *grepprg* to use *rg* as search tool with this parameters: >
 There is no other settings yet.
 
 ==============================================================================
-RIPGREP COMMAND                        *:RipGrep* *:RipGrepAsync* *ripgrep-command*
+RIPGREP COMMAND                                      *:RipGrep* *ripgrep-command*
 
 :RipGrep [{options}] {pattern} [{path} ...]
                     Search for {pattern} in the path {path} ... and set
@@ -52,16 +52,12 @@ RIPGREP COMMAND                        *:RipGrep* *:RipGrepAsync* *ripgrep-comma
                     You can find detailed description about the options in
                     the last section of this document |ripgrep-rg-help|
 
-If you have installed |asynchrun| plugin, you will get an asynchron version of
-this command too:
-
-:RipGrepAsync [{options}] {pattern} [{path} ...]
-                    The same as |:RipGrep| but runs |rg| in the background.
+Note: If you have |asynchrun| plugin installed, then |rg| will run in the background.
 
 Other commands can be defined for searching in specified directories, like 
 this: >
     command! -nargs=+ -complete=file RipGrepInDir1AndDir2 
-    \ execute 'RipGrepAsync '.ripgrep#ReadParams('-g', '!*/_*', '-g', '*.ext', <f-args>, dir1, dir2)
+    \ execute 'RipGrep '.ripgrep#ReadParams('-g', '!*/_*', '-g', '*.ext', <f-args>, dir1, dir2)
 
 The above command searches in files with *.ext extension in "dir1" and "dir2" but 
 not in directories with "_" prefix.
