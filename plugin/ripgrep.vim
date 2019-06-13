@@ -31,11 +31,13 @@ scriptencoding utf-8
 "let s:ripgrep_debug = 1
 
 " Preprocessing
-if exists('g:loaded_vim_ripgrep') && !exists('s:ripgrep_debug')
-  finish
-elseif v:version < 700
-  echoerr 'vim-ripgrep does not work this version of Vim "' . v:version . '".'
-  finish
+if !exists('s:ripgrep_debug')
+  if exists('g:loaded_vim_ripgrep') 
+    finish
+  elseif v:version < 700
+    echoerr 'vim-ripgrep does not work this version of Vim "' . v:version . '".'
+    finish
+  endif
 endif
 
 if (!executable('rg')) 
@@ -89,7 +91,6 @@ function! g:ripgrep#BuildHighlightPattern(pattern)
   " ^ --> ''
   let regex = substitute(regex,'^\^','', '')
 
-  call ripgrep#echod('ReEsc:'.regex)
   "word 
   if index(g:ripgrep_parameters, '"-w"') != -1 
     let regex = '\<'.regex.'\>'
@@ -100,6 +101,8 @@ function! g:ripgrep#BuildHighlightPattern(pattern)
   if index(g:ripgrep_parameters, '"-i"') != -1 
     let regex = '\c'.regex
   endif
+
+  call ripgrep#echod('ReEsc:'.regex)
   return regex
 endfunction
 
@@ -117,7 +120,7 @@ endfunction
 
 " it should run only after grep
 function! g:ripgrep#HighlightMatched()
-  call ripgrep#echod('Highlight...')
+  call ripgrep#echod('Highlight matching text ...')
   call ripgrep#SetQuickFixWindowProperties()
   
  	let qf_cmd = getqflist({'title' : 1})['title']
@@ -254,7 +257,7 @@ endfunction
 
 augroup vim_ripgrep_global_command_group
   autocmd!
-  autocmd FileType qf call ripgrep#HighlightMatched() 
+  autocmd WinEnter * if &buftype == 'quickfix' | call ripgrep#HighlightMatched() | endif 
   autocmd QuickFixCmdPost grep copen 8 | wincmd J
 
   " close with q or esc
@@ -306,4 +309,5 @@ endif
 "ok :RipGrepAsync autocmd\ File %
 "
 "yank the next line to a register, then run with @<register>
-"0f:ly$:"
+"0f:ly$:"
+
