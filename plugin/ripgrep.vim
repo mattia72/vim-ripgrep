@@ -118,22 +118,27 @@ function! g:ripgrep#BuildMatchCmd(regex, match_cmd_num)
   return cmd
 endfunction
 
-" it should run only after grep
-function! g:ripgrep#HighlightMatched()
-  call ripgrep#echod('Highlight matching text ...')
-  call ripgrep#SetQuickFixWindowProperties()
-  
+function! g:ripgrep#IsRgExecutedInQF()
  	let qf_cmd = getqflist({'title' : 1})['title']
+  return qf_cmd =~ '^:\?\(AsyncRun\)\?\s\?rg'
+endfunction
 
-  if qf_cmd =~ '^:\?\(AsyncRun\)\?\s\?rg' && exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
-    "don't match before second |
-    let cmd = 'match none | match Error' 
-    let regex = ripgrep#BuildHighlightPattern(trim(g:ripgrep_search_pattern,'"'))
-    execute 'match none'
-    execute ripgrep#BuildMatchCmd(regex, 1)
-    execute ripgrep#BuildMatchCmd(regex, 2)
-    execute ripgrep#BuildMatchCmd(regex, 3)
-  endif            
+" it should run only after grep
+function! g:ripgrep#HighlightMatchedInQuickfixIfRgExecuted()
+  if &buftype == 'quickfix' && ripgrep#IsRgExecutedInQF()
+    call ripgrep#echod('Highlight matching text ...')
+    call ripgrep#SetQuickFixWindowProperties()
+
+    if exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
+      "don't match before second |
+      let cmd = 'match none | match Error' 
+      let regex = ripgrep#BuildHighlightPattern(trim(g:ripgrep_search_pattern,'"'))
+      execute 'match none'
+      execute ripgrep#BuildMatchCmd(regex, 1)
+      execute ripgrep#BuildMatchCmd(regex, 2)
+      execute ripgrep#BuildMatchCmd(regex, 3)
+    endif            
+  endif
 endfunction
 
 function! g:ripgrep#echod(msg)
@@ -257,8 +262,8 @@ endfunction
 
 augroup vim_ripgrep_global_command_group
   autocmd!
-  autocmd WinEnter * if &buftype == 'quickfix' | call ripgrep#HighlightMatched() | endif 
-  autocmd QuickFixCmdPost grep copen 8 | wincmd J
+  autocmd WinEnter * call ripgrep#HighlightMatchedInQuickfixIfRgExecuted() 
+  autocmd QuickFixCmdPost grep if ripgrep#IsRgExecutedInQF() | copen 8 | wincmd J | call ripgrep#HighlightMatchedInQuickfixIfRgExecuted() | endif
 
   " close with q or esc
   autocmd FileType qf if mapcheck('<esc>', 'n') ==# '' | nnoremap <buffer><silent> <esc> :cclose<bar>lclose<CR> | endif
