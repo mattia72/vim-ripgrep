@@ -57,7 +57,7 @@ Note: If you have |asynchrun| plugin installed, then |rg| will run in the backgr
 Other commands can be defined for searching in specified directories, like 
 this: >
     command! -nargs=+ -complete=file RipGrepInDir1AndDir2 
-    \ execute 'RipGrep '.ripgrep#ReadParams('-g', '!*/_*', '-g', '*.ext', <f-args>, dir1, dir2)
+    \ execute 'RipGrep '.ripgrep#ReadParams('-g', '!*/_*', '-g', '*.ext', <q-args>, dir1, dir2)
 
 The above command searches in files with *.ext extension in "dir1" and "dir2" but 
 not in directories with "_" prefix.
@@ -83,22 +83,22 @@ Other encoding: >
 ==============================================================================
 MAPPINGS                                                     *ripgrep-mappings*
 
-The plugin defines no mappings but here are some suggestions: >
+The plugin define the following mappings if |g:ripgrep_skip_mappings|
+is NOT defined:
 
-  " ripgrep in current file
-  nnoremap <leader>rf <ESC>:RipGrep %<Left><Left>
-  " ripgrep in current directory
-  nnoremap <leader>rd <ESC>:RipGrepAsync 
+Normal mode
+------------------------------------------------------------------------------
+<leader>rw      ripgrep in current file
+<leader>rW      ripgrep in current directory
 
-  " find all word under cursor in the current file 
-  nnoremap <leader>fa <ESC>:RipGrep -w <C-R><C-W> %<Left><Left>
-  " find all word under cursor in the current directory
-  nnoremap <leader>fA <ESC>:RipGrepAsync -w <C-R><C-W> 
+Visual mode
+------------------------------------------------------------------------------
+<leader>rs      ripgrep selected in current file
+<leader>rS      ripgrep selected in current directory
 
-  " find all selected in the current file 
-  vnoremap <leader>fa y<ESC>:RipGrep <C-R>0 %<Left><Left>
-  " find all selected in the current directory 
-  vnoremap <leader>fA y<ESC>:RipGrepAsync <C-R>0
+Note: Try to avoid selecting single apostrophes in visual mode, 
+it causes escaping issues. If you get errors, push <C-C> to exit from the
+script. After that, you can open the quickfix window, to examine the results.
 
 ==============================================================================
 QUICKFIX                                                     *ripgrep-quickfix*

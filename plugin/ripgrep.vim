@@ -79,8 +79,8 @@ function! g:ripgrep#BuildHighlightPattern(pattern)
   call ripgrep#echod('ReEsc:"'.a:pattern.'"')
   " \% and \# --> % and #
   let regex = substitute(a:pattern,'\\\([#%]\)',{m -> m[1]}, 'g')
-  " + and ? --> \+ and \?
-  let regex = substitute(regex,'\([+?]\)',{m -> "\\".m[1]}, 'g')
+  " ',+ and ? --> \+ and \?
+  let regex = substitute(regex,'\([''+?]\)',{m -> "\\".m[1]}, 'g')
   " eg. apostrophe (") \x22 --> \%x22
   let regex = substitute(regex,'\\\([xu]\d\+\)',{m -> "\\%".m[1]}, 'g')
 
@@ -120,6 +120,9 @@ endfunction
 
 function! g:ripgrep#IsRgExecutedInQF()
  	let qf_cmd = getqflist({'title' : 1})['title']
+  if &buftype == 'quickfix'
+ 	  match none
+  endif
   return qf_cmd =~ '^:\?\(AsyncRun\)\?\s\?rg'
 endfunction
 
@@ -131,7 +134,7 @@ function! g:ripgrep#HighlightMatchedInQuickfixIfRgExecuted()
 
     if exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
       "don't match before second |
-      let cmd = 'match none | match Error' 
+      "let cmd = 'match none | match Error' 
       let regex = ripgrep#BuildHighlightPattern(trim(g:ripgrep_search_pattern,'"'))
       execute 'match none'
       execute ripgrep#BuildMatchCmd(regex, 1)
@@ -161,7 +164,7 @@ function! g:ripgrep#BuildParamsforAsync()
   return params
 endfunction
 
-function! g:ripgrep#BuildSearchPattern(pattern)
+function! g:ripgrep#EscapeSearchPattern(pattern)
   let escaped = trim(escape(a:pattern, '%#'),'"')
 
   " apostrophe (") --> \x22 
@@ -195,7 +198,7 @@ function! g:ripgrep#ReadParams(...)
       endif
     else " else search string
       if pattern_set == 0 
-        let escaped = ripgrep#BuildSearchPattern(a:000[i])
+        let escaped = ripgrep#EscapeSearchPattern(a:000[i])
         call insert(g:ripgrep_parameters, g:ripgrep_search_pattern)
         call ripgrep#echod('Rg pattern:'.g:ripgrep_search_pattern)
         let pattern_set = 1
@@ -282,15 +285,23 @@ else
 endif
 
 " ----------------------
-" TODO Mappings
+" Mappings
 " ----------------------
+
+if !exists('g:ripgrep_skip_mappings')
+  " ripgrep in current file
+  nnoremap <leader>rw <ESC>:execute 'RipGrep -w '.ripgrep#EscapeSearchPattern('<C-R><C-W>').' %'<CR>
+  " ripgrep in current dir
+  nnoremap <leader>rW <ESC>:execute 'RipGrep -w '.ripgrep#EscapeSearchPattern('<C-R><C-W>')<CR>
+  " ripgrep selected in current file
+  vnoremap <leader>rs y<ESC>:execute 'RipGrep '.ripgrep#EscapeSearchPattern(escape('<C-R>0',' ')).' %'<CR>
+  " ripgrep selected in current dir 
+  vnoremap <leader>rS y<ESC>:execute 'RipGrep '.ripgrep#EscapeSearchPattern(escape('<C-R>0',' '))<CR>
+endif
+
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
-
-if exists('s:ripgrep_debug')
-  unlet s:ripgrep_debug
-endif
 
 " ----------------------
 " TODO Tests
