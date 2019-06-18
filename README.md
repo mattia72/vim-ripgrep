@@ -13,6 +13,7 @@ It is recommended to use a plugin manager for Vim plugins.
 If you prefer [vim-plug](https://github.com/junegunn/vim-plug "vim-plug") as
 well, put this lines into your plugin list:
 ```
+Plug 'skywind3000/asyncrun.vim'  " If you prefer async behaviour
 Plug 'mattia72/vim-ripgrep' 
 ```
 
