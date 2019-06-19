@@ -289,9 +289,9 @@ endif
 " ----------------------
 
 if !exists('g:ripgrep_skip_mappings')
-  " ripgrep in current file
+  " ripgrep word under cursor in current file
   nnoremap <leader>rw <ESC>:execute 'RipGrep -w '.ripgrep#EscapeSearchPattern('<C-R><C-W>').' %'<CR>
-  " ripgrep in current dir
+  " ripgrep word under cursor in current dir
   nnoremap <leader>rW <ESC>:execute 'RipGrep -w '.ripgrep#EscapeSearchPattern('<C-R><C-W>')<CR>
   " ripgrep selected in current file
   vnoremap <leader>rs y<ESC>:execute 'RipGrep '.ripgrep#EscapeSearchPattern(escape('<C-R>0',' ')).' %'<CR>

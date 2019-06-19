@@ -88,13 +88,13 @@ is NOT defined:
 
 Normal mode
 ------------------------------------------------------------------------------
-<leader>rw      ripgrep in current file
-<leader>rW      ripgrep in current directory
+<leader>rw      ripgrep word under cursor in current file
+<leader>rW      ripgrep word under cursor current directory
 
 Visual mode
 ------------------------------------------------------------------------------
-<leader>rs      ripgrep selected in current file
-<leader>rS      ripgrep selected in current directory
+<leader>rs      ripgrep selected text in current file
+<leader>rS      ripgrep selected text in current directory
 
 Note: Try to avoid selecting single apostrophes in visual mode, 
 it causes escaping issues. If you get errors, push <C-C> to exit from the
