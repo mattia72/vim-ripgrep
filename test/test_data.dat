@@ -1,0 +1,21 @@
+# vim-ripgrep.vim's test suite
+
+# BEGIN first_line
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+# END first_line
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolores in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+
+# test comment
+test space
+test hash#
+test percent%
+test backslash\
+test "double quoted string"
+test 'single quoted string'
+
+# vim: filetype=conf: nu

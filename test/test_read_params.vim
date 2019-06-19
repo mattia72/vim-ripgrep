@@ -1,5 +1,5 @@
 "=============================================================================
-" File:          test_ripgrep.vim
+" File:          test_read_params.vim
 " Author:        Mattia72 
 " Description:   unit tests (works with h1mesuke/vim-unittest)   
 " Created:       16.05.2019
@@ -26,19 +26,23 @@
 " }}}
 "=============================================================================
 
-let s:tc = unittest#testcase#new("Parameter conversion")
+let s:tc = unittest#testcase#new("Parameter conversions")
 
 function! s:tc.SETUP()
-  let s:save_rg_parameters = g:ripgrep_parameters
-  let s:save_rg_pattern = g:ripgrep_search_pattern
-  let s:save_rg_path = g:ripgrep_search_path
+  if exists('g:ripgrep_parameters')
+    let s:save_rg_parameters = g:ripgrep_parameters
+    let s:save_rg_pattern = g:ripgrep_search_pattern
+    let s:save_rg_path = g:ripgrep_search_path
+  endif
   let g:ripgrep_parameters = []
 endfunction
 
 function! s:tc.TEARDOWN()
-  let g:ripgrep_parameters = s:save_rg_parameters 
-  let g:ripgrep_search_pattern = s:save_rg_pattern 
-  let g:ripgrep_search_path = s:save_rg_path 
+  if exists('s:save_rg_parameters')
+    let g:ripgrep_parameters = s:save_rg_parameters 
+    let g:ripgrep_search_pattern = s:save_rg_pattern 
+    let g:ripgrep_search_path = s:save_rg_path 
+  endif
 endfunction
 
 "----------------------------------------
@@ -103,3 +107,4 @@ function! s:tc.test_highlight_regex_if_params_exists()
   let params_out = g:ripgrep#BuildHighlightPattern(params_in)
 	call self.assert_equal('\c\zs\<seARCH\>\ze', params_out, "Highlight regex test")
 endfunction
+

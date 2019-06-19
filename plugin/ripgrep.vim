@@ -133,8 +133,6 @@ function! g:ripgrep#HighlightMatchedInQuickfixIfRgExecuted()
     call ripgrep#SetQuickFixWindowProperties()
 
     if exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
-      "don't match before second |
-      "let cmd = 'match none | match Error' 
       let regex = ripgrep#BuildHighlightPattern(trim(g:ripgrep_search_pattern,'"'))
       execute 'match none'
       execute ripgrep#BuildMatchCmd(regex, 1)
@@ -307,13 +305,15 @@ unlet s:save_cpo
 " TODO Tests
 " ----------------------
 "
+"For running a command listed here yank the next line as is to a register 
+"(eg. to t: "tyy), then run it with @<register>:
+"0f:ly$:"
+
 "  Special characters
-"
+" ----------------------
 "ok :RipGrep ripgrep\#Echo %
 "ok :RipGrep -w ripgrep %
-"ok :RipGrepAsync ripgrep\#Echo %
-"ok :RipGrep \#\% %
-"ok :RipGrepAsync \#\% %
+"nok:RipGrep \#\% %
 "ok :RipGrep ^\s*"\ .* %
 "ok :RipGrep ^\s*\x22\ .* %
 "nok zs is not supported by rg: RipGrep ^\s*\zs\x22\ .* %
@@ -322,8 +322,4 @@ unlet s:save_cpo
 "  Space...
 "
 "ok :RipGrep autocmd\ File %
-"ok :RipGrepAsync autocmd\ File %
 "
-"yank the next line to a register, then run with @<register>
-"0f:ly$:"
-
