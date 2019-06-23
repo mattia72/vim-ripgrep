@@ -13,8 +13,11 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 # test comment
 test space
 test hash#
+test #hashes#
 test percent%
+test %percents%
 test backslash\
+test \backslashes\
 test "double quoted string"
 test 'single quoted string'
 
