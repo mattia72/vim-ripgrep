@@ -29,6 +29,7 @@
 scriptencoding utf-8
 
 "let s:ripgrep_debug = 1
+"unlet s:ripgrep_debug
 
 " Preprocessing
 if !exists('s:ripgrep_debug')
@@ -168,8 +169,11 @@ function! g:ripgrep#BuildParamsforAsync()
 endfunction
 
 function! g:ripgrep#EscapeSearchPattern(pattern)
-  let escaped = trim(escape(a:pattern, '%#'),'"')
+  let escaped = a:pattern
+  " backslash (\) --> \\
+  "let escaped  = substitute(escaped,'\\','\\\\\\\\', 'g')
 
+  let escaped = trim(escape(escaped, '%#'),'"')
   " apostrophe (") --> \x22 
   let escaped  = substitute(escaped,'"','\\x22', 'g')
   
@@ -226,7 +230,7 @@ function! g:ripgrep#ExecRipGrep()
   let cmd = 'silent grep! '
   " now join from the beginning
   for p in g:ripgrep_parameters | let cmd .= ' '.p | endfor
-  call ripgrep#echod('ExecRipGrep: exec' . cmd)
+  call ripgrep#echod('ExecRipGrep: execute ' . cmd)
 	"echohl ModeMsg | echo 'RipGrep: '.substitute(cmd,'silent grep! ','rg','') | echohl None
   execute cmd
 endfunction

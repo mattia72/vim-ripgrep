@@ -54,7 +54,7 @@ function! s:tc.test_9_search_percents()
 endfunction
 
 function! s:tc.test_b_search_backslashes()
-  call g:helper.run_all_cmd('\\backslashes\\ test_data.dat', 1, 'test \backslashes\')
+  call g:helper.run_all_cmd('\\\\backslashes\\\\ test_data.dat', 1, 'test \backslashes\')
 endfunction
 
 unlet s:tc
