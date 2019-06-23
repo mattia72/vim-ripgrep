@@ -31,10 +31,17 @@ function helper#new(testcase)
   let obj = {} 
   let obj.tc = a:testcase
   let obj.lorem_first_line = ''
-  let obj.save_rg_parameters = g:ripgrep_parameters
-  let obj.save_rg_pattern = g:ripgrep_search_pattern
-  let obj.save_rg_path = g:ripgrep_search_path
+  if exists('g:ripgrep_parameters')
+    let obj.save_rg_parameters = g:ripgrep_parameters
+    let obj.save_rg_pattern = g:ripgrep_search_pattern
+    let obj.save_rg_path = g:ripgrep_search_path
+  else
+    let obj.save_rg_parameters = ''
+    let obj.save_rg_pattern = ''
+    let obj.save_rg_path = ''
+  endif
   let obj.save_cwd = getcwd() 
+
 
   function! obj.setup()
     execute 'cd '.expand('<sfile>:p:h')
@@ -60,9 +67,9 @@ function helper#new(testcase)
 
   function! obj.teardown()
     if exists('s:save_rg_parameters')
-      let g:ripgrep_parameters     = self.save_rg_parameters
+      let g:ripgrep_parameters = self.save_rg_parameters
       let g:ripgrep_search_pattern = self.save_rg_pattern
-      let g:ripgrep_search_path    = self.save_rg_path
+      let g:ripgrep_search_path = self.save_rg_path
     endif
     delcommand TestRipGrep
     delcommand TestRipGrepAsync

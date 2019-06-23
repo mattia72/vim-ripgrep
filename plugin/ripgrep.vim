@@ -76,7 +76,7 @@ function! g:ripgrep#SetQuickFixWindowProperties()
 endfunction
 
 function! g:ripgrep#BuildHighlightPattern(pattern)
-  call ripgrep#echod('ReEsc:"'.a:pattern.'"')
+  call ripgrep#echod('BuildHighlightPattern:"'.a:pattern.'"')
   " \% and \# --> % and #
   let regex = substitute(a:pattern,'\\\([#%]\)',{m -> m[1]}, 'g')
   " ',+ and ? --> \+ and \?
@@ -102,7 +102,7 @@ function! g:ripgrep#BuildHighlightPattern(pattern)
     let regex = '\c'.regex
   endif
 
-  call ripgrep#echod('ReEsc:'.regex)
+  call ripgrep#echod('BuildHighlightPattern:'.regex)
   return regex
 endfunction
 
@@ -144,7 +144,11 @@ endfunction
 
 function! g:ripgrep#echod(msg)
   if exists('s:ripgrep_debug')
-    echom a:msg
+    if exists(':Decho')
+      call Decho(a:msg)
+    else
+      echom a:msg
+    endif
   endif
 endfunction
 
@@ -152,6 +156,7 @@ function! g:ripgrep#BuildParamsforAsync()
   let params = ''
   for p in g:ripgrep_parameters 
     if (p!=g:ripgrep_search_pattern)
+      " we should remove only one from the begin and the end
       let param = substitute(p,'^"','','')
       let param = substitute(param,'"$','','')
     else
@@ -173,36 +178,38 @@ function! g:ripgrep#EscapeSearchPattern(pattern)
 endfunction
 
 function! g:ripgrep#ReadParams(...)
-  let i = a:0 - 1
-  let is_path = 1
   let g:ripgrep_parameters = []
+  let g:ripgrep_search_path = []
+  let g:ripgrep_search_pattern = ''
   let pattern_set=0
   let path_set=0
-  let g:ripgrep_search_path = []
+  let i = a:0 - 1
+  let is_path = 1
+  call ripgrep#echod('ReadParams: '.string(a:000))
   while i >= 0
-    call ripgrep#echod('Rg param '.i.': '.a:000[i])
+    call ripgrep#echod('ReadParams param '.i.': '.a:000[i])
     " if last parameter is a file/directory
 
     if is_path == 1 
       let file_or_dir = glob(expand(a:000[i]))
       if !empty(file_or_dir) && (isdirectory(file_or_dir) || filereadable(file_or_dir))
-        call ripgrep#echod('Rg param '.i.' is path:'.file_or_dir)
+        call ripgrep#echod('ReadParams param '.i.' is path:'.file_or_dir)
         call insert(g:ripgrep_parameters, shellescape(a:000[i]))
         call insert(g:ripgrep_search_path, file_or_dir)
       else
         let is_path = 0
-        call ripgrep#echod('Rg param '.i.' is NOT path!')
+        call ripgrep#echod('ReadParams param '.i.' is NOT path!')
         continue
       endif
     else " else search string
       if pattern_set == 0 
         let escaped = ripgrep#EscapeSearchPattern(a:000[i])
         call insert(g:ripgrep_parameters, g:ripgrep_search_pattern)
-        call ripgrep#echod('Rg pattern:'.g:ripgrep_search_pattern)
+        call ripgrep#echod('ReadParams param '.i.' is pattern:'.g:ripgrep_search_pattern)
         let pattern_set = 1
       else " else rg parameters
+        call ripgrep#echod('ReadParams param '.i.' is rg parameter:'.a:000[i])
         call insert(g:ripgrep_parameters, shellescape(trim(a:000[i],'"')))
-        "call ripgrep#echod('Rg param:'.g:ripgrep_parameters)
       endif
       let is_path = 0
     endif
@@ -213,19 +220,13 @@ function! g:ripgrep#ReadParams(...)
     call add(g:ripgrep_parameters, '.')
   endif
 
-  let params = ripgrep#BuildParamsforAsync()
-
-  call ripgrep#echod('Rg: '.params )
-	echohl ModeMsg | echo 'RipGrep: rg '.params | echohl None
-	" The return value goes to Async Command
-  return trim(params,' ')
 endfunction
 
 function! g:ripgrep#ExecRipGrep()
   let cmd = 'silent grep! '
   " now join from the beginning
   for p in g:ripgrep_parameters | let cmd .= ' '.p | endfor
-  "call ripgrep#echod('RipGrep run: ' . cmd)
+  call ripgrep#echod('ExecRipGrep: exec' . cmd)
 	"echohl ModeMsg | echo 'RipGrep: '.substitute(cmd,'silent grep! ','rg','') | echohl None
   execute cmd
 endfunction
@@ -248,6 +249,16 @@ function! ripgrep#EchoResultMsg(header_footer_line_count)
   else
     echohl WarningMsg | echo 'RipGrep: No match found in '.search_path | echohl None
   endif
+endfunction
+
+function! g:ripgrep#ReadParamsAsync(...)
+  call call('ripgrep#ReadParams', a:000)
+  let params = ripgrep#BuildParamsforAsync()
+  call ripgrep#echod('ReadParamsAsync: '.params )
+
+	echohl ModeMsg | echo 'RipGrep: rg '.params | echohl None
+	" The return value goes to Async Command
+  return trim(params,' ')
 endfunction
 
 function! g:ripgrep#RipGrep(...)
@@ -277,7 +288,8 @@ augroup END
 
 if (exists(':AsyncRun'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrep
-	      \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.escape(ripgrep#ReadParams(<f-args>),'#%')
+	        \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
+          \ escape(ripgrep#ReadParamsAsync(<f-args>),'#%')
 else
   command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
 endif
