@@ -153,7 +153,7 @@ function! g:ripgrep#echod(msg)
   endif
 endfunction
 
-function! g:ripgrep#BuildParamsforAsync()
+function! g:ripgrep#BuildParamsForCmd()
   let params = ''
   for p in g:ripgrep_parameters 
     if (p!=g:ripgrep_search_pattern)
@@ -255,9 +255,10 @@ function! ripgrep#EchoResultMsg(header_footer_line_count)
   endif
 endfunction
 
-function! g:ripgrep#ReadParamsAsync(...)
+function! g:ripgrep#ReadParamsForCmd(...)
+  " this is weird, but the args are so ok
   call call('ripgrep#ReadParams', a:000)
-  let params = ripgrep#BuildParamsforAsync()
+  let params = ripgrep#BuildParamsForCmd()
   call ripgrep#echod('ReadParamsAsync: '.params )
 
 	echohl ModeMsg | echo 'RipGrep: rg '.params | echohl None
@@ -293,7 +294,7 @@ augroup END
 if (exists(':AsyncRun'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrep
 	        \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
-          \ escape(ripgrep#ReadParamsAsync(<f-args>),'#%')
+          \ escape(ripgrep#ReadParamsForCmd(<f-args>),'#%')
 else
   command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
 endif
