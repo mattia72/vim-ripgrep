@@ -81,7 +81,7 @@ function! g:ripgrep#BuildHighlightPattern(pattern)
   " \% and \# --> % and #
   let regex = substitute(a:pattern,'\\\([#%]\)',{m -> m[1]}, 'g')
   " ',+ and ? --> \+ and \?
-  let regex = substitute(regex,'\([''+?]\)',{m -> "\\".m[1]}, 'g')
+  let regex = substitute(regex,'\([''+?|()]\)',{m -> "\\".m[1]}, 'g')
   " eg. apostrophe (") \x22 --> \%x22
   let regex = substitute(regex,'\\\([xu]\d\+\)',{m -> "\\%".m[1]}, 'g')
 
@@ -231,7 +231,7 @@ function! g:ripgrep#ExecRipGrep()
   " now join from the beginning
   for p in g:ripgrep_parameters | let cmd .= ' '.p | endfor
   call ripgrep#echod('ExecRipGrep: execute ' . cmd)
-	"echohl ModeMsg | echo 'RipGrep: '.substitute(cmd,'silent grep! ','rg','') | echohl None
+	"echohl ModeMsg | echo 'vim-ripgrep: '.substitute(cmd,'silent grep! ','rg','') | echohl None
   execute cmd
 endfunction
 
@@ -247,11 +247,11 @@ function! ripgrep#EchoResultMsg(header_footer_line_count)
   let qflist = getqflist()
  	let qf_size = len(qflist) - a:header_footer_line_count
   if qf_size > 0
-	  echohl ModeMsg | echo 'RipGrep: '.qf_size.' matches found in '.search_path | echohl None
+	  echohl ModeMsg | echo 'vim-ripgrep: '.qf_size.' matches found in '.search_path | echohl None
 	  " so we get info about parsing errors...
 	  copen
   else
-    echohl WarningMsg | echo 'RipGrep: No match found in '.search_path | echohl None
+    echohl WarningMsg | echo 'vim-ripgrep: No match found in '.search_path | echohl None
   endif
 endfunction
 
@@ -261,7 +261,7 @@ function! g:ripgrep#ReadParamsForCmd(...)
   let params = ripgrep#BuildParamsForCmd()
   call ripgrep#echod('ReadParamsAsync: '.params )
 
-	echohl ModeMsg | echo 'RipGrep: rg '.params | echohl None
+	echohl ModeMsg | echo 'vim-ripgrep: rg '.params | echohl None
 	" The return value goes to Async Command
   return trim(params,' ')
 endfunction
