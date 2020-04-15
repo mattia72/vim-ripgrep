@@ -57,7 +57,7 @@ Note: If you have |asynchrun| plugin installed, then |rg| will run in the backgr
 Other commands can be defined for searching in specified directories, like 
 this: >
     command! -nargs=+ -complete=file RipGrepInDir1AndDir2 
-    \ execute 'RipGrep '.ripgrep#ReadParams('-g', '!*/_*', '-g', '*.ext', <q-args>, dir1, dir2)
+    \ execute 'RipGrep '.ripgrep#ReadParamsForcmd('-g', '!*/_*', '-g', '*.ext', <q-args>, dir1, dir2)
 
 The above command searches in files with *.ext extension in "dir1" and "dir2" but 
 not in directories with "_" prefix.
