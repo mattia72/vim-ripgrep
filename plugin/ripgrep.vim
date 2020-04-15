@@ -273,6 +273,11 @@ function! g:ripgrep#RipGrep(...)
   call ripgrep#EchoResultMsg(0)
 endfunction
 
+function! g:ripgrep#Path2Param()
+  let arr = split(&path,',')
+  " TODO RipGrep in path!
+endfunction
+
 " ----------------------
 " Autocommands
 " ----------------------
@@ -291,6 +296,7 @@ augroup END
 " Commands
 " ----------------------
 
+" TODO RipGrep in path!
 if (exists(':AsyncRun'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrep
 	        \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
