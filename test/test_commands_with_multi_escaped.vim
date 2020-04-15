@@ -45,16 +45,16 @@ endfunction
 " COMMAND TEST
 "---------------------------------------
 
-function! s:tc.test_6_search_hashes()
-  call g:helper.run_all_cmd('\#hashes\# test_data.dat', 1, 'test #hashes#')
+function! s:tc.test_1_search_hashes()
+  call g:helper.run_all_cmd('hashes\#\# test_data.dat', 1, 'test #hashes#')
 endfunction
 
-function! s:tc.test_9_search_percents()
-  call g:helper.run_all_cmd('\%percents\% test_data.dat', 1, 'test %percents%')
-endfunction
+"function! s:tc.test_2_search_percents()
+  "call g:helper.run_all_cmd('more\%\ percents\% test_data.dat', 1, 'test more% percents%')
+"endfunction
 
-function! s:tc.test_b_search_backslashes()
-  call g:helper.run_all_cmd('\\\\backslashes\\\\ test_data.dat', 1, 'test \backslashes\')
-endfunction
+"function! s:tc.test_3_search_backslashes()
+  "call g:helper.run_all_cmd('\\backslashes\\ test_data.dat', 1, 'test \backslashes\')
+"endfunction
 
 unlet s:tc

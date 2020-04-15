@@ -31,6 +31,8 @@ function helper#new(testcase)
   let obj = {} 
   let obj.tc = a:testcase
   let obj.lorem_first_line = ''
+  " TODO set get_dbg_msg = 1 for dbg output
+  let obj.get_dbg_msg = 1
   if exists('g:ripgrep_parameters')
     let obj.save_rg_parameters = g:ripgrep_parameters
     let obj.save_rg_pattern = g:ripgrep_search_pattern
@@ -106,6 +108,13 @@ function helper#new(testcase)
       call self.tc.assert_equal(a:expected_qf_text, getqflist()[a:cmd =~ 'Async' ? 1 : 0].text, msg)
     endif
     call self.tc.assert_equal(exp_qf_len, qf_length, msg)
+
+    if self.get_dbg_msg == 1
+      for em in split(msg, '\n')
+        echom em
+      endfor
+    endif
+
   endfunction
 
   function! obj.run_all_cmd(params, expected_qf_len, expected_qf_text)

@@ -181,7 +181,7 @@ function! g:ripgrep#EscapeSearchPattern(pattern)
   return g:ripgrep_search_pattern
 endfunction
 
-function! g:ripgrep#ReadParams(...)
+function! g:ripgrep#FillParameters(...)
   let g:ripgrep_parameters = []
   let g:ripgrep_search_path = []
   let g:ripgrep_search_pattern = ''
@@ -219,11 +219,6 @@ function! g:ripgrep#ReadParams(...)
     endif
     let i -= 1
   endwhile
-
-  if len(g:ripgrep_search_path) == 0
-    call add(g:ripgrep_parameters, '.')
-  endif
-
 endfunction
 
 function! g:ripgrep#ExecRipGrep()
@@ -256,7 +251,12 @@ function! ripgrep#EchoResultMsg(header_footer_line_count)
 endfunction
 
 function! g:ripgrep#ReadParamsAsync(...)
-  call call('ripgrep#ReadParams', a:000)
+  call call('ripgrep#FillParameters', a:000)
+
+  if len(g:ripgrep_search_path) == 0
+    call add(g:ripgrep_parameters, '.')
+  endif
+
   let params = ripgrep#BuildParamsforAsync()
   call ripgrep#echod('ReadParamsAsync: '.params )
 
@@ -265,9 +265,25 @@ function! g:ripgrep#ReadParamsAsync(...)
   return trim(params,' ')
 endfunction
 
+function! g:ripgrep#GetBuffers()
+  let buffs = ''
+	for buf in getbufinfo({'buflisted':1})
+		"let buffs.=''
+		"let buffs.=buf.name
+		"let buffs.=' '
+    call add(g:ripgrep_parameters, buf.name)
+	endfor
+	return buffs
+endfunction
+
 function! g:ripgrep#RipGrep(...)
   " this is weird, but the args are so ok
-  call call('ripgrep#ReadParams', a:000)
+  call call('ripgrep#FillParameters', a:000)
+
+  if len(g:ripgrep_search_path) == 0
+    call add(g:ripgrep_parameters, '.')
+  endif
+
   call ripgrep#ExecRipGrep()  
   call ripgrep#EchoResultMsg(0)
 endfunction
@@ -294,9 +310,14 @@ if (exists(':AsyncRun'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrep
 	        \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
           \ escape(ripgrep#ReadParamsAsync(<f-args>),'#%')
+
+  command! -bang -nargs=+ -range=0 -complete=file RipGrepOpenBuffers
+        \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
+        \ escape(ripgrep#ReadParamsAsyncB(<f-args>),'#%')
 else
   command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
 endif
+
 
 " ----------------------
 " Mappings

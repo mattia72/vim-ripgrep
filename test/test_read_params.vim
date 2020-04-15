@@ -50,46 +50,46 @@ endfunction
 "----------------------------------------
 function! s:tc.test_param_one_word_search()
   let params_in = 'search_string'
-  let params_out = g:ripgrep#ReadParams(params_in)
+  let params_out = g:ripgrep#FillParameters(params_in)
 	call self.assert_equal('"search_string" .',params_out, "RipGrepAsync parameter input test")
-	call self.assert_equal(['"search_string"', '.'], g:ripgrep_parameters, "RipGrep parameter input test")
+	call self.assert_equal(['"search_string"'], g:ripgrep_parameters, "RipGrep parameter input test")
 endfunction
 "----------------------------------------
 function! s:tc.test_param_one_word_with_space_search()
   let params_in = 'search string'
   " this should be written in command line 'search\ string'
-  let params_out = g:ripgrep#ReadParams(params_in)
-	call self.assert_equal('"search string" .',params_out, "RipGrepAsync parameter input test")
-	call self.assert_equal(['"search string"', '.'], g:ripgrep_parameters, "RipGrep parameter input test")
+  let params_out = g:ripgrep#FillParameters(params_in)
+	call self.assert_equal('"search string"', params_out, "RipGrepAsync parameter input test")
+	call self.assert_equal(['"search string"'], g:ripgrep_parameters, "RipGrep parameter input test")
 endfunction
 "----------------------------------------
 function! s:tc.test_param_one_word_with_apostrophe()
   let params_in = 'search string "has" aposthrophe'
   " this should be written in command line 'search\#string'
-  let params_out = g:ripgrep#ReadParams(params_in)
-	call self.assert_equal('"search string \x22has\x22 aposthrophe" .',params_out, "RipGrepAsync parameter input test")
-	call self.assert_equal(['"search string \x22has\x22 aposthrophe"', '.'], g:ripgrep_parameters, "RipGrep params")
+  let params_out = g:ripgrep#FillParameters(params_in)
+	call self.assert_equal('"search string \x22has\x22 aposthrophe"',params_out, "RipGrepAsync parameter input test")
+	call self.assert_equal(['"search string \x22has\x22 aposthrophe"'], g:ripgrep_parameters, "RipGrep params")
 endfunction
 "----------------------------------------
 function! s:tc.test_param_one_word_with_extra_param()
-  let params_out = g:ripgrep#ReadParams('"-w"', '"search"')
-	call self.assert_equal('-w "search" .',params_out, "RipGrepAsync parameter input test")
-	call self.assert_equal(['"-w"','"search"', '.'], g:ripgrep_parameters, "RipGrep parameter input test")
+  let params_out = g:ripgrep#FillParameters('"-w"', '"search"')
+	call self.assert_equal('-w "search"',params_out, "RipGrepAsync parameter input test")
+	call self.assert_equal(['"-w"','"search"'], g:ripgrep_parameters, "RipGrep parameter input test")
 endfunction
 "----------------------------------------
 function! s:tc.test_param_one_word_with_extra_search()
   let params_in = 'search#string'
   " this should be written in command line 'search\#string'
-  let params_out = g:ripgrep#ReadParams(params_in)
-	call self.assert_equal('"search\#string" .',params_out, "RipGrepAsync parameter input test")
-	call self.assert_equal(['"search\#string"', '.'], g:ripgrep_parameters, "RipGrep parameter input test")
+  let params_out = g:ripgrep#FillParameters(params_in)
+	call self.assert_equal('"search\#string"',params_out, "RipGrepAsync parameter input test")
+	call self.assert_equal(['"search\#string"'], g:ripgrep_parameters, "RipGrep parameter input test")
 endfunction
 "----------------------------------------
 function! s:tc.test_param_one_word_with_regex_search()
   let params_in = '\bsearch[a-z]\w+'
-  let params_out = g:ripgrep#ReadParams(params_in)
-	call self.assert_equal(['"\bsearch[a-z]\w+"', '.'], g:ripgrep_parameters, "RipGrep parameter input test")
-	call self.assert_equal('"\bsearch[a-z]\w+" .',params_out, "RipGrepAsync parameter input test")
+  let params_out = g:ripgrep#FillParameters(params_in)
+	call self.assert_equal('"\bsearch[a-z]\w+"', params_out, "RipGrepAsync parameter input test")
+	call self.assert_equal(['"\bsearch[a-z]\w+"'], g:ripgrep_parameters, "RipGrep parameter input test")
 endfunction
 
 "---------------------------------------

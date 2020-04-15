@@ -49,14 +49,14 @@ function! s:tc.test_4_search_space()
   call g:helper.run_all_cmd('test\ space test_data.dat', 1, 'test space')
 endfunction
 
-function! s:tc.test_6_search_hash()
-  call g:helper.run_all_cmd('hash\# test_data.dat', 1, 'test hash#')
+function! s:tc.test_5_search_percent()
+  "TODO if you search "percent%" it finds percents! also... 
+  call g:helper.run_cmd('TestRipGrepAsync','1\% test_data.dat', 1, 'test one percent 1%')
+  call g:helper.run_cmd('TestRipGrep',     '1\% test_data.dat', 1, 'test one percent 1%')
 endfunction
 
-function! s:tc.test_5_search_percent()
-  "TODO it finds percents also... why?
-  call g:helper.run_cmd('TestRipGrepAsync','percent\% test_data.dat', 1, 'test percent%')
-  call g:helper.run_cmd('TestRipGrep',     'percent\% test_data.dat', 1, 'test percent%')
+function! s:tc.test_6_search_hash()
+  call g:helper.run_all_cmd('hash\# test_data.dat', 1, 'test hash#')
 endfunction
 
 function! s:tc.test_7_search_backslash()
@@ -64,8 +64,8 @@ function! s:tc.test_7_search_backslash()
 endfunction
 
 function! s:tc.test_8_search_comment()
-  call g:helper.run_cmd('TestRipGrepAsync', '\#\s*test\ comment test_data.dat', 1, '# test comment')
-  call g:helper.run_cmd('TestRipGrep', '\#\s*test\ comment test_data.dat', 1, '# test comment')
+  call g:helper.run_cmd('TestRipGrepAsync', '\\\#\s*test\ comment test_data.dat', 1, '# test comment')
+  call g:helper.run_cmd('TestRipGrep',      '\\\#\s*test\ comment test_data.dat', 1, '# test comment')
 endfunction
 
 unlet s:tc

@@ -14,8 +14,8 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 test space
 test hash#
 test #hashes#
-test percent%
-test %percents%
+test one percent 1%
+test more% percents%
 test backslash\
 test \backslashes\
 test "double quoted string"

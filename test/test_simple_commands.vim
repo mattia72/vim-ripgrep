@@ -27,7 +27,7 @@
 "=============================================================================
 
 let s:here = expand('<sfile>:p:h')
-let s:tc = unittest#testcase#new("Command output", { 'data': s:here . '/test_data.dat' })
+let s:tc = unittest#testcase#new("Simple word search", { 'data': s:here . '/test_data.dat' })
 
 exec 'source '.s:here.'/helper.vim'
 
