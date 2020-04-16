@@ -259,7 +259,7 @@ function! g:ripgrep#ReadParamsForCmd(...)
   " this is weird, but the args are so ok
   call call('ripgrep#ReadParams', a:000)
   let params = ripgrep#BuildParamsForCmd()
-  call ripgrep#echod('ReadParamsAsync: '.params )
+  call ripgrep#echod('ReadParamsForCmd: '.params )
 
 	echohl ModeMsg | echo 'vim-ripgrep: rg '.params | echohl None
 	" The return value goes to Async Command
