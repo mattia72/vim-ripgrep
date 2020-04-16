@@ -58,7 +58,7 @@ function helper#new(testcase)
     if (exists(':AsyncRun'))
       command! -bang -nargs=+ -range=0 -complete=file TestRipGrepAsync
 	          \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
-            \ escape(ripgrep#ReadParamsAsync(<f-args>),'#%')
+            \ escape(ripgrep#ReadParamsForCmd(<f-args>),'#%')
 	  endif
     command! -nargs=+ -complete=file TestRipGrep call ripgrep#RipGrep(<f-args>)
 
