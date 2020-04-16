@@ -33,22 +33,22 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 28 - ((8 * winheight(0) + 15) / 30)
+let s:l = 28 - ((11 * winheight(0) + 21) / 43)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 28
 normal! 0
 tabnext
-edit test_commands_with_multi_escaped.vim
+edit test_all.vim
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
 1wincmd h
-wincmd w
 wincmd _ | wincmd |
 split
 1wincmd k
+wincmd w
 wincmd w
 set nosplitbelow
 set nosplitright
@@ -68,7 +68,26 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 56 - ((10 * winheight(0) + 9) / 19)
+let s:l = 9 - ((8 * winheight(0) + 7) / 14)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+9
+normal! 064|
+lcd ~\dev\vim\vim-ripgrep\test
+wincmd w
+argglobal
+if bufexists("~\dev\vim\vim-ripgrep\test\test_commands_with_multi_escaped.vim") | buffer ~\dev\vim\vim-ripgrep\test\test_commands_with_multi_escaped.vim | else | edit ~\dev\vim\vim-ripgrep\test\test_commands_with_multi_escaped.vim | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 56 - ((13 * winheight(0) + 12) / 24)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -77,8 +96,8 @@ normal! 0
 lcd ~\dev\vim\vim-ripgrep\test
 wincmd w
 argglobal
-if bufexists("~\dev\vim\vim-ripgrep\test\test_data.dat") | buffer ~\dev\vim\vim-ripgrep\test\test_data.dat | else | edit ~\dev\vim\vim-ripgrep\test\test_data.dat | endif
-setlocal fdm=manual
+if bufexists("~\dev\vim\vim-ripgrep\plugin\ripgrep.vim") | buffer ~\dev\vim\vim-ripgrep\plugin\ripgrep.vim | else | edit ~\dev\vim\vim-ripgrep\plugin\ripgrep.vim | endif
+setlocal fdm=diff
 setlocal fde=0
 setlocal fmr={{{,}}}
 setlocal fdi=#
@@ -86,47 +105,28 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-silent! normal! zE
-let s:l = 15 - ((9 * winheight(0) + 9) / 19)
+let s:l = 276 - ((47 * winheight(0) + 27) / 54)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-15
-normal! 026|
-wincmd w
-argglobal
-if bufexists("~\dev\vim\vim-ripgrep\test\helper.vim") | buffer ~\dev\vim\vim-ripgrep\test\helper.vim | else | edit ~\dev\vim\vim-ripgrep\test\helper.vim | endif
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 107 - ((9 * winheight(0) + 9) / 19)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-107
-normal! 015|
+276
+normal! 016|
 lcd ~\dev\vim\vim-ripgrep\test
 wincmd w
-2wincmd w
+3wincmd w
 wincmd =
 tabnext 2
 set stal=1
-badd +31 ~\dev\vim\vim-ripgrep\plugin\ripgrep.vim
-badd +4 ~\dev\vim\vim-ripgrep\test\test_data.dat
-badd +53 ~\dev\vim\vim-ripgrep\test\test_commands_with_single_escaped.vim
-badd +107 ~\dev\vim\vim-ripgrep\test\helper.vim
 badd +1 ~\dev\vim\vim-ripgrep\Session.vim
+badd +56 ~\dev\vim\vim-ripgrep\test\test_commands_with_multi_escaped.vim
+badd +107 ~\dev\vim\vim-ripgrep\test\helper.vim
+badd +4 ~\dev\vim\vim-ripgrep\test\test_data.dat
+badd +1 ~\dev\vim\vim-ripgrep\plugin\ripgrep.vim
+badd +53 ~\dev\vim\vim-ripgrep\test\test_commands_with_single_escaped.vim
 badd +9 ~\dev\vim\vim-ripgrep\test\test_all.vim
 badd +13 ~\dev\vim\vim-ripgrep\README.md
 badd +89 ~\dev\vim\vim-ripgrep\test\test_read_params.vim
 badd +30 ~\dev\vim\vim-ripgrep\test\test_simple_commands.vim
-badd +56 ~\dev\vim\vim-ripgrep\test\test_commands_with_multi_escaped.vim
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
   silent exe 'bwipe ' . s:wipebuf
 endif
