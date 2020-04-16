@@ -31,7 +31,7 @@ let s:tc = unittest#testcase#new("Simple word search", { 'data': s:here . '/test
 
 exec 'source '.s:here.'/helper.vim'
 
-let g:helper = helper#new(s:tc)
+let g:helper = helper#new(s:tc, g:ripgrep_dbg)
 
 function! s:tc.SETUP()
   call g:helper.setup()
