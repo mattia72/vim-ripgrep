@@ -33,22 +33,18 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 28 - ((11 * winheight(0) + 21) / 43)
+let s:l = 115 - ((27 * winheight(0) + 21) / 43)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-28
-normal! 0
+115
+normal! 036|
 tabnext
-edit test_all.vim
+edit test_commands_with_multi_escaped.vim
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
 1wincmd h
-wincmd _ | wincmd |
-split
-1wincmd k
-wincmd w
 wincmd w
 set nosplitbelow
 set nosplitright
@@ -68,31 +64,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 9 - ((8 * winheight(0) + 7) / 14)
+let s:l = 34 - ((9 * winheight(0) + 10) / 21)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-9
-normal! 064|
-lcd ~\dev\vim\vim-ripgrep\test
-wincmd w
-argglobal
-if bufexists("~\dev\vim\vim-ripgrep\test\test_commands_with_multi_escaped.vim") | buffer ~\dev\vim\vim-ripgrep\test\test_commands_with_multi_escaped.vim | else | edit ~\dev\vim\vim-ripgrep\test\test_commands_with_multi_escaped.vim | endif
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 56 - ((13 * winheight(0) + 12) / 24)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-56
-normal! 0
+34
+normal! 033|
 lcd ~\dev\vim\vim-ripgrep\test
 wincmd w
 argglobal
@@ -105,25 +82,25 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 276 - ((47 * winheight(0) + 27) / 54)
+let s:l = 31 - ((30 * winheight(0) + 21) / 43)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-276
-normal! 016|
+31
+normal! 021|
 lcd ~\dev\vim\vim-ripgrep\test
 wincmd w
-3wincmd w
+2wincmd w
 wincmd =
 tabnext 2
 set stal=1
-badd +1 ~\dev\vim\vim-ripgrep\Session.vim
-badd +56 ~\dev\vim\vim-ripgrep\test\test_commands_with_multi_escaped.vim
+badd +12 ~\dev\vim\vim-ripgrep\test\test_all.vim
 badd +107 ~\dev\vim\vim-ripgrep\test\helper.vim
+badd +55 ~\dev\vim\vim-ripgrep\test\test_commands_with_multi_escaped.vim
+badd +0 ~\dev\vim\vim-ripgrep\plugin\ripgrep.vim
+badd +1 ~\dev\vim\vim-ripgrep\Session.vim
 badd +4 ~\dev\vim\vim-ripgrep\test\test_data.dat
-badd +1 ~\dev\vim\vim-ripgrep\plugin\ripgrep.vim
 badd +53 ~\dev\vim\vim-ripgrep\test\test_commands_with_single_escaped.vim
-badd +9 ~\dev\vim\vim-ripgrep\test\test_all.vim
 badd +13 ~\dev\vim\vim-ripgrep\README.md
 badd +89 ~\dev\vim\vim-ripgrep\test\test_read_params.vim
 badd +30 ~\dev\vim\vim-ripgrep\test\test_simple_commands.vim

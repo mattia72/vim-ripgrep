@@ -31,7 +31,7 @@ let s:tc = unittest#testcase#new("Commands with multi escaped chars", { 'data': 
 
 exec 'source '.s:here.'/helper.vim'
 
-let g:helper = helper#new(s:tc)
+let g:helper = helper#new(s:tc, g:ripgrep_dbg )
 
 function! s:tc.SETUP()
   call g:helper.setup()

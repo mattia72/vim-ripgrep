@@ -26,13 +26,16 @@
 " }}}
 "=============================================================================
 
-function helper#new(testcase)
+" params: testcase, optionaly:get_dbg_msg
+function helper#new(testcase, ...)
 
   let obj = {} 
   let obj.tc = a:testcase
   let obj.lorem_first_line = ''
-  " TODO set get_dbg_msg = 1 for dbg output
-  let obj.get_dbg_msg = 1
+  if a:0 > 0 && exists('a:1') " the number of extra arguments
+    let obj.get_dbg_msg = a:1 
+  fi
+
   if exists('g:ripgrep_parameters')
     let obj.save_rg_parameters = g:ripgrep_parameters
     let obj.save_rg_pattern = g:ripgrep_search_pattern
@@ -109,7 +112,7 @@ function helper#new(testcase)
     endif
     call self.tc.assert_equal(exp_qf_len, qf_length, msg)
 
-    if self.get_dbg_msg == 1
+    if exists(self.get_dbg_msg) && self.get_dbg_msg == 1
       for em in split(msg, '\n')
         echom em
       endfor

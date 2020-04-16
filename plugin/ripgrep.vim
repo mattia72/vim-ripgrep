@@ -28,11 +28,10 @@
 
 scriptencoding utf-8
 
-"let s:ripgrep_debug = 1
-"unlet s:ripgrep_debug
+let g:ripgrep_dbg = 0
 
 " Preprocessing
-if !exists('s:ripgrep_debug')
+if !exists('g:ripgrep_dbg') || g:ripgrep_dbg == 0
   if exists('g:loaded_vim_ripgrep') 
     finish
   elseif v:version < 700
@@ -144,7 +143,7 @@ function! g:ripgrep#HighlightMatchedInQuickfixIfRgExecuted()
 endfunction
 
 function! g:ripgrep#echod(msg)
-  if exists('s:ripgrep_debug')
+  if exists('g:ripgrep_dbg') && g:ripgrep_dbg == 1
     if exists(':Decho')
       call Decho(a:msg)
     else
@@ -252,7 +251,12 @@ endfunction
 
 function! g:ripgrep#ReadParamsForCmd(...)
   " this is weird, but the args are so ok
-  call call('ripgrep#ReadParams', a:000)
+  call call('ripgrep#FillParameters', a:000)
+  
+  if len(g:ripgrep_search_path) == 0
+    call add(g:ripgrep_parameters, '.')
+  endif
+
   let params = ripgrep#BuildParamsForCmd()
   call ripgrep#echod('ReadParamsForCmd: '.params )
 
@@ -275,10 +279,6 @@ endfunction
 function! g:ripgrep#RipGrep(...)
   " this is weird, but the args are so ok
   call call('ripgrep#FillParameters', a:000)
-
-  if len(g:ripgrep_search_path) == 0
-    call add(g:ripgrep_parameters, '.')
-  endif
 
   call ripgrep#ExecRipGrep()  
   call ripgrep#EchoResultMsg(0)
