@@ -286,7 +286,8 @@ endfunction
 
 function! g:ripgrep#Path2Param()
   let arr = split(&path,',')
-  " TODO RipGrep in path!
+  let dirs = join(arr, " ") 
+  return dirs
 endfunction
 
 " ----------------------
@@ -336,25 +337,3 @@ endif
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" ----------------------
-" TODO Tests
-" ----------------------
-"
-"For running a command listed here yank the next line as is to a register 
-"(eg. to t: "tyy), then run it with @<register>:
-"0f:ly$:"
-
-"  Special characters
-" ----------------------
-"ok :RipGrep ripgrep\#Echo %
-"ok :RipGrep -w ripgrep %
-"nok:RipGrep \#\% %
-"ok :RipGrep ^\s*"\ .* %
-"ok :RipGrep ^\s*\x22\ .* %
-"nok zs is not supported by rg: RipGrep ^\s*\zs\x22\ .* %
-"ok : !rg ^\s+"".* %
-
-"  Space...
-"
-"ok :RipGrep autocmd\ File %
-"
