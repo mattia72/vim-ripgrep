@@ -28,7 +28,7 @@
 
 scriptencoding utf-8
 
-let g:ripgrep_dbg = 0
+let g:ripgrep_dbg = 1
 
 " Preprocessing
 if !exists('g:ripgrep_dbg') || g:ripgrep_dbg == 0
@@ -249,8 +249,8 @@ function! ripgrep#EchoResultMsg(header_footer_line_count)
   endif
 endfunction
 
-function! g:ripgrep#ReadParamsForCmd(...)
-  " this is weird, but the args are so ok
+function! g:ripgrep#GetParamsForCommand(...)
+  " this is weird, but the args are only this way ok
   call call('ripgrep#FillParameters', a:000)
   
   if len(g:ripgrep_search_path) == 0
@@ -258,11 +258,40 @@ function! g:ripgrep#ReadParamsForCmd(...)
   endif
 
   let params = ripgrep#BuildParamsForCmd()
-  call ripgrep#echod('ReadParamsForCmd: '.params )
+  call ripgrep#echod('GetParamsForCommand: '.params )
 
 	echohl ModeMsg | echo 'vim-ripgrep: rg '.params | echohl None
 	" The return value goes to Async Command
   return trim(params,' ')
+endfunction
+
+function! g:ripgrep#RipGrep(...)
+  " this is weird, but the args are so ok
+  call call('ripgrep#FillParameters', a:000)
+
+  call ripgrep#ExecRipGrep()  
+  call ripgrep#EchoResultMsg(0)
+endfunction
+
+function! g:ripgrep#RipGrepInPath(...)
+  " this is weird, but the args are so ok
+  call call('ripgrep#FillParameters', a:000)
+
+  call ripgrep#Path2Param()
+
+  call ripgrep#ExecRipGrep()  
+  call ripgrep#EchoResultMsg(0)
+endfunction
+
+function! g:ripgrep#Path2Param()
+  let arr = split(&path,',')
+  if exists('g:ripgrep_search_path')
+    call add(g:ripgrep_search_path, arr) 
+  else
+    let g:ripgrep_search_path = arr
+  endif
+
+  return  g:ripgrep_search_pattern
 endfunction
 
 function! g:ripgrep#GetBuffers()
@@ -274,20 +303,6 @@ function! g:ripgrep#GetBuffers()
     call add(g:ripgrep_parameters, buf.name)
 	endfor
 	return buffs
-endfunction
-
-function! g:ripgrep#RipGrep(...)
-  " this is weird, but the args are so ok
-  call call('ripgrep#FillParameters', a:000)
-
-  call ripgrep#ExecRipGrep()  
-  call ripgrep#EchoResultMsg(0)
-endfunction
-
-function! g:ripgrep#Path2Param()
-  let arr = split(&path,',')
-  let dirs = join(arr, " ") 
-  return dirs
 endfunction
 
 " ----------------------
@@ -312,7 +327,7 @@ augroup END
 if (exists(':AsyncRun'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrep
 	        \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
-          \ escape(ripgrep#ReadParamsForCmd(<f-args>),'#%')
+          \ escape(ripgrep#GetParamsForCommand(<f-args>),'#%')
 else
   command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
 endif

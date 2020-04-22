@@ -1,5 +1,5 @@
 "=============================================================================
-" File:          test_commanands_with_multi_escaped.vim
+" File:          test_read_path_to_params.vim
 " Author:        Mattia72 
 " Description:   unit tests (works with h1mesuke/vim-unittest)   
 " Created:       16.05.2019
@@ -26,51 +26,35 @@
 " }}}
 "=============================================================================
 
-let s:here = expand('<sfile>:p:h')
-let s:tc = unittest#testcase#new("Commands with multi escaped chars", { 'data': s:here . '/test_data.dat' })
-
-exec 'source '.s:here.'/helper.vim'
-
-let g:helper = helper#new(s:tc, g:ripgrep_dbg )
+let s:tc = unittest#testcase#new("Path to parameter")
 
 function! s:tc.SETUP()
-  call g:helper.setup()
+  if exists('g:ripgrep_parameters')
+    let s:save_rg_parameters = g:ripgrep_parameters
+    let s:save_rg_pattern = g:ripgrep_search_pattern
+    let s:save_rg_path = g:ripgrep_search_path
+  endif
+  let g:ripgrep_parameters = []
+  let s:save_path = &path
 endfunction
 
 function! s:tc.TEARDOWN()
-  call g:helper.teardown()
+  if exists('s:save_rg_parameters')
+    let g:ripgrep_parameters = s:save_rg_parameters 
+    let g:ripgrep_search_pattern = s:save_rg_pattern 
+    let g:ripgrep_search_path = s:save_rg_path 
+  endif
+  let path = s:save_path 
 endfunction
 
-"---------------------------------------
-" COMMAND TEST
-"---------------------------------------
-
-function! s:tc.test_1_search_hashes_at_word_end()
-  call g:helper.run_all_cmd('hashes\#\# test_data.dat', 1, 'test hashes##')
+"----------------------------------------
+" PARAMETER READING
+"----------------------------------------
+function! s:tc.test_path2param()
+  let params_in = '?'
+  let path_arr = g:ripgrep#Path2Param()
+  let params_out = join(g:ripgrep_search_path, ' ')
+	call self.assert_equal(params_in, params_out, "RipGrepAsync parameter input test")
+	"call self.assert_equal(['"search_string"'], g:ripgrep_parameters, "RipGrep parameter input test")
 endfunction
-
-function! s:tc.test_2_search_hashes_middle_and_end_of_word()
-  call g:helper.run_all_cmd('h\#ashes\# test_data.dat', 1, 'test h#ashes#')
-endfunction
-
-function! s:tc.test_3_search_hashes_at_word_begin_end()
-  call g:helper.run_all_cmd('\\#hashes\# test_data.dat', 1, 'test #hashes#')
-endfunction
-
-function! s:tc.test_4_search_percents()
-  call g:helper.run_all_cmd('more\%\ percents\% test_data.dat', 1, 'test more% percents%')
-endfunction
-
-"function! s:tc.test_5_search_percents_at_word_begin_end()
-  "call g:helper.run_all_cmd('\%percents\% test_data.dat', 1, 'test more %percents%')
-"endfunction
-
-"function! s:tc.test_6_search_percents_at_word_end()
-  "call g:helper.run_all_cmd('percents\%\% test_data.dat', 1, 'test more percents%%')
-"endfunction
-
-"function! s:tc.test_7_search_backslashes()
-  "call g:helper.run_all_cmd('\\backslashes\\ test_data.dat', 1, 'test \backslashes\')
-"endfunction
-
-unlet s:tc
+"----------------------------------------
