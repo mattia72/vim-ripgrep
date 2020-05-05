@@ -28,7 +28,7 @@
 
 scriptencoding utf-8
 
-let g:ripgrep_dbg = 1
+let g:ripgrep_dbg = 0
 
 " Preprocessing
 if !exists('g:ripgrep_dbg') || g:ripgrep_dbg == 0
