@@ -312,7 +312,7 @@ endfunction
 augroup vim_ripgrep_global_command_group
   autocmd!
   autocmd WinEnter * call ripgrep#HighlightMatchedInQuickfixIfRgExecuted() 
-  autocmd QuickFixCmdPost grep if ripgrep#IsRgExecutedInQF() | copen 8 | wincmd J | call ripgrep#HighlightMatchedInQuickfixIfRgExecuted() | endif
+  autocmd QuickFixCmdPost grep if ripgrep#IsRgExecutedInQF() | copen 8 | wincmd J | setlocal syntax=qf | call ripgrep#HighlightMatchedInQuickfixIfRgExecuted() | endif
 
   " close with q or esc
   autocmd FileType qf if mapcheck('<esc>', 'n') ==# '' | nnoremap <buffer><silent> <esc> :cclose<bar>lclose<CR> | endif
