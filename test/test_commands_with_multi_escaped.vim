@@ -46,31 +46,31 @@ endfunction
 "---------------------------------------
 
 function! s:tc.test_1_search_hashes_at_word_end()
-  call g:helper.run_all_cmd('hashes\#\# test_data.dat', 1, 'test hashes##')
+  call g:helper.run_all_RipGrep_cmd('hashes\#\# test_data.dat', 1, 'test hashes##')
 endfunction
 
 function! s:tc.test_2_search_hashes_middle_and_end_of_word()
-  call g:helper.run_all_cmd('h\#ashes\# test_data.dat', 1, 'test h#ashes#')
+  call g:helper.run_all_RipGrep_cmd('h\#ashes\# test_data.dat', 1, 'test h#ashes#')
 endfunction
 
 function! s:tc.test_3_search_hashes_at_word_begin_end()
-  call g:helper.run_all_cmd('\\#hashes\# test_data.dat', 1, 'test #hashes#')
+  call g:helper.run_all_RipGrep_cmd('\\#hashes\# test_data.dat', 1, 'test #hashes#')
 endfunction
 
 function! s:tc.test_4_search_percents()
-  call g:helper.run_all_cmd('more\%\ percents\% test_data.dat', 1, 'test more% percents%')
+  call g:helper.run_all_RipGrep_cmd('more\%\ percents\% test_data.dat', 1, 'test more% percents%')
 endfunction
 
 "function! s:tc.test_5_search_percents_at_word_begin_end()
-  "call g:helper.run_all_cmd('\%percents\% test_data.dat', 1, 'test more %percents%')
+  "call g:helper.run_all_RipGrep_cmd('\%percents\% test_data.dat', 1, 'test more %percents%')
 "endfunction
 
 "function! s:tc.test_6_search_percents_at_word_end()
-  "call g:helper.run_all_cmd('percents\%\% test_data.dat', 1, 'test more percents%%')
+  "call g:helper.run_all_RipGrep_cmd('percents\%\% test_data.dat', 1, 'test more percents%%')
 "endfunction
 
 "function! s:tc.test_7_search_backslashes()
-  "call g:helper.run_all_cmd('\\backslashes\\ test_data.dat', 1, 'test \backslashes\')
+  "call g:helper.run_all_RipGrep_cmd('\\backslashes\\ test_data.dat', 1, 'test \backslashes\')
 "endfunction
 
 unlet s:tc

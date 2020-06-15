@@ -46,13 +46,13 @@ endfunction
 "---------------------------------------
 
 function! s:tc.test_1_search_simple_word()
-  call g:helper.run_all_cmd('dolor test_data.dat', 4, g:helper.lorem_first_line)
+  call g:helper.run_all_RipGrep_cmd('dolor test_data.dat', 4, g:helper.lorem_first_line)
 endfunction
 
 function! s:tc.test_2_search_simple_whole_word()
-  call g:helper.run_all_cmd('-w dolor test_data.dat', 1, g:helper.lorem_first_line)
+  call g:helper.run_all_RipGrep_cmd('-w dolor test_data.dat', 1, g:helper.lorem_first_line)
 endfunction
 
 function! s:tc.test_3_search_simple_whole_word_only_in_dat()
-  call g:helper.run_all_cmd('-w -g *.dat dolor', 1, g:helper.lorem_first_line)
+  call g:helper.run_all_RipGrep_cmd('-w -g *.dat dolor', 1, g:helper.lorem_first_line)
 endfunction

@@ -46,7 +46,7 @@ endfunction
 "---------------------------------------
 
 function! s:tc.test_4_search_space()
-  call g:helper.run_all_cmd('test\ space test_data.dat', 1, 'test space')
+  call g:helper.run_all_RipGrep_cmd('test\ space test_data.dat', 1, 'test space')
 endfunction
 
 function! s:tc.test_5_search_percent()
@@ -56,11 +56,11 @@ function! s:tc.test_5_search_percent()
 endfunction
 
 function! s:tc.test_6_search_hash()
-  call g:helper.run_all_cmd('hash\# test_data.dat', 1, 'test hash#')
+  call g:helper.run_all_RipGrep_cmd('hash\# test_data.dat', 1, 'test hash#')
 endfunction
 
 function! s:tc.test_7_search_backslash()
-  call g:helper.run_all_cmd('backslash\\\\\\\\ test_data.dat', 1, 'test backslash\')
+  call g:helper.run_all_RipGrep_cmd('backslash\\\\\\\\ test_data.dat', 1, 'test backslash\')
 endfunction
 
 function! s:tc.test_8_search_comment()

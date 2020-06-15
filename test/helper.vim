@@ -62,8 +62,12 @@ function helper#new(testcase, ...)
       command! -bang -nargs=+ -range=0 -complete=file TestRipGrepAsync
 	          \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
             \ escape(ripgrep#ReadParamsForCmd(<f-args>),'#%')
+    command! -bang -nargs=+ -range=0 -complete=file TestRipGrepPathAsync
+	          \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
+            \ escape(ripgrep#GetParamsForCommand(<f-args>),'#%').' '.ripgrep#Path2Param()
 	  endif
     command! -nargs=+ -complete=file TestRipGrep call ripgrep#RipGrep(<f-args>)
+    command! -nargs=+ -complete=file TestRipGrepPath call ripgrep#RipGrepPath(<f-args>)
 
     let self.tc.saved = {}
     let self.tc.data.marker_formats = ['# BEGIN %s', '# END %s']
@@ -76,10 +80,16 @@ function helper#new(testcase, ...)
       let g:ripgrep_search_pattern = self.save_rg_pattern
       let g:ripgrep_search_path = self.save_rg_path
     endif
-    delcommand TestRipGrep
-    delcommand TestRipGrepAsync
-    cclose
 
+    delcommand TestRipGrep
+    delcommand TestRipGrepPath
+
+    if (exists(':AsyncRun'))
+      delcommand TestRipGrepAsync
+      delcommand TestRipGrepPathAsync
+    endif
+
+    cclose
     execute 'cd '.self.save_cwd
   endfunction
 
@@ -120,8 +130,14 @@ function helper#new(testcase, ...)
 
   endfunction
 
-  function! obj.run_all_cmd(params, expected_qf_len, expected_qf_text)
+  function! obj.run_all_RipGrep_cmd(params, expected_qf_len, expected_qf_text)
     for cmd in ['TestRipGrepAsync' , 'TestRipGrep']
+      call self.run_cmd(cmd, a:params, a:expected_qf_len, a:expected_qf_text)
+    endfor
+  endfunction
+
+  function! obj.run_all_RipGrepPath_cmd(params, expected_qf_len, expected_qf_text)
+    for cmd in ['TestRipGrepPathAsync' , 'TestRipGrepPath']
       call self.run_cmd(cmd, a:params, a:expected_qf_len, a:expected_qf_text)
     endfor
   endfunction

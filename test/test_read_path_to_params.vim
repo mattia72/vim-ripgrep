@@ -31,30 +31,52 @@ let s:tc = unittest#testcase#new("Path to parameter")
 function! s:tc.SETUP()
   if exists('g:ripgrep_parameters')
     let s:save_rg_parameters = g:ripgrep_parameters
-    let s:save_rg_pattern = g:ripgrep_search_pattern
-    let s:save_rg_path = g:ripgrep_search_path
   endif
-  let g:ripgrep_parameters = []
+  if exists('g:ripgrep_search_pattern')
+    let s:save_rg_pattern    = g:ripgrep_search_pattern
+  endif
+  if exists('g:ripgrep_search_path')
+    let s:save_rg_path       = g:ripgrep_search_path
+  endif
+  let g:ripgrep_parameters     = []
+  let g:ripgrep_search_pattern = []
+  let g:ripgrep_search_path    = []
   let s:save_path = &path
 endfunction
 
 function! s:tc.TEARDOWN()
   if exists('s:save_rg_parameters')
     let g:ripgrep_parameters = s:save_rg_parameters 
+  endif
+  if exists('s:save_rg_pattern')
     let g:ripgrep_search_pattern = s:save_rg_pattern 
+  endif
+  if exists('s:save_rg_path')
     let g:ripgrep_search_path = s:save_rg_path 
   endif
-  let path = s:save_path 
+  set path<
 endfunction
 
-"----------------------------------------
-" PARAMETER READING
-"----------------------------------------
-function! s:tc.test_path2param()
-  let params_in = '?'
-  let path_arr = g:ripgrep#Path2Param()
-  let params_out = join(g:ripgrep_search_path, ' ')
-	call self.assert_equal(params_in, params_out, "RipGrepAsync parameter input test")
-	"call self.assert_equal(['"search_string"'], g:ripgrep_parameters, "RipGrep parameter input test")
+" setup for each test
+function! s:tc.setup()
+  let g:ripgrep_search_path    = []
 endfunction
 "----------------------------------------
+" TESTS
+"----------------------------------------
+function! s:tc.test_1_path2param_dot()
+  setlocal path=. 
+  let expected = '.'
+  let path_arr = g:ripgrep#Path2Param()
+  let params_out = join(g:ripgrep_search_path, ',')
+	call self.assert_equal(expected, params_out, "Path2Param test path=.")
+endfunction
+"----------------------------------------
+function! s:tc.test_2_path2param_dot_and_tilde()
+  setlocal path=.,~ 
+  let expected = '.,'.glob('~')
+  let path_arr = g:ripgrep#Path2Param()
+  "echom string(path_arr)
+  let params_out = join(g:ripgrep_search_path, ',')
+	call self.assert_equal(expected, params_out, "Path2Param test path=.,~")
+endfunction
