@@ -80,6 +80,9 @@ Note: '"' will be converted to '\x22' internally, because of escaping issues
 Other encoding: >
   :RipGrep -E latin1 Käuser
 
+Regex operator shoudn't escaped: >
+  :Ripgrep -i word1|word2 %
+
 ==============================================================================
 MAPPINGS                                                     *ripgrep-mappings*
 

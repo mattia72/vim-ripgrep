@@ -286,7 +286,7 @@ endfunction
 function! g:ripgrep#Path2Param()
   let arr = split(&path,',')
   if exists('g:ripgrep_search_path')
-    call add(g:ripgrep_search_path, arr) 
+    call g:ripgrep_search_path = g:ripgrep_search_path + arr) 
   else
     let g:ripgrep_search_path = arr
   endif
