@@ -134,10 +134,10 @@ function! g:ripgrep#HighlightMatchedInQuickfixIfRgExecuted()
 
     if exists('g:ripgrep_search_pattern') && exists('g:ripgrep_parameters')
       let regex = ripgrep#BuildHighlightPattern(trim(g:ripgrep_search_pattern,'"'))
-      execute 'match none'
-      execute ripgrep#BuildMatchCmd(regex, 1)
-      execute ripgrep#BuildMatchCmd(regex, 2)
-      execute ripgrep#BuildMatchCmd(regex, 3)
+      call ripgrep#ExecCmd('match none')
+      call ripgrep#ExecCmd(ripgrep#BuildMatchCmd(regex, 1))
+      call ripgrep#ExecCmd(ripgrep#BuildMatchCmd(regex, 2))
+      call ripgrep#ExecCmd(ripgrep#BuildMatchCmd(regex, 3))
     endif            
   endif
 endfunction
@@ -226,7 +226,14 @@ function! g:ripgrep#ExecRipGrep()
   for p in g:ripgrep_parameters | let cmd .= ' '.p | endfor
   call ripgrep#echod('ExecRipGrep: execute ' . cmd)
 	"echohl ModeMsg | echo 'vim-ripgrep: '.substitute(cmd,'silent grep! ','rg','') | echohl None
-  execute cmd
+	call ripgrep#ExecCmd(cmd)
+endfunction
+
+function! g:ripgrep#ExecCmd(command)
+  let tmp=&shell
+  set shell=cmd
+  execute a:command
+  let &shell=tmp
 endfunction
 
 function! ripgrep#EchoResultMsg(header_footer_line_count)
@@ -326,8 +333,8 @@ augroup END
 " TODO RipGrep in path!
 if (exists(':AsyncRun'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrep
-	        \ execute 'AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
-          \ escape(ripgrep#GetParamsForCommand(<f-args>),'#%')
+	        \ call ripgrep#ExecCmd('AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
+          \ escape(ripgrep#GetParamsForCommand(<f-args>),'#%'))
 else
   command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
 endif
@@ -343,6 +350,7 @@ if !exists('g:ripgrep_skip_mappings')
   " ripgrep word under cursor in current dir
   nnoremap <leader>rW <ESC>:execute 'RipGrep -w '.ripgrep#EscapeSearchPattern('<C-R><C-W>')<CR>
   " ripgrep selected in current file
+  " let s:cmd=' '.ripgrep#EscapeSearchPattern(escape('<C-R>0',' ')).' %'
   vnoremap <leader>rs y<ESC>:execute 'RipGrep '.ripgrep#EscapeSearchPattern(escape('<C-R>0',' ')).' %'<CR>
   " ripgrep selected in current dir 
   vnoremap <leader>rS y<ESC>:execute 'RipGrep '.ripgrep#EscapeSearchPattern(escape('<C-R>0',' '))<CR>
@@ -350,5 +358,5 @@ endif
 
 
 let &cpo = s:save_cpo
-unlet s:save_cpo
+unlet! s:save_cpo
 
