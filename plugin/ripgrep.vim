@@ -339,7 +339,6 @@ else
   command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
 endif
 
-
 " ----------------------
 " Mappings
 " ----------------------
