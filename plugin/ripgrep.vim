@@ -230,10 +230,21 @@ function! g:ripgrep#ExecRipGrep()
 endfunction
 
 function! g:ripgrep#ExecCmd(command)
-  let tmp=&shell
-  set shell=cmd
+  let tmp_list=[&shell, &shellquote, &shellpipe, &shellxquote, &shellcmdflag, &shellredir]
+  " set back to default...
+	set shellquote& 
+  set shellpipe&
+  set shellxquote&
+  set shellcmdflag&
+  set shellredir&
+  set shell&
   execute a:command
-  let &shell=tmp
+  let &shell        = tmp_list[0]
+  let &shellquote   = tmp_list[1]
+  let &shellpipe    = tmp_list[2]
+  let &shellxquote  = tmp_list[3]
+  let &shellcmdflag = tmp_list[4]
+  let &shellredir   = tmp_list[5]
 endfunction
 
 function! ripgrep#EchoResultMsg(header_footer_line_count)
