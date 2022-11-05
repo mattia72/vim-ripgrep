@@ -247,7 +247,11 @@ function! g:ripgrep#ExecCmd(command)
   let &shellredir   = tmp_list[5]
 endfunction
 
-function! ripgrep#EchoResultMsg(header_footer_line_count)
+function! g:ripgrep#EchoResultMsg(...)
+  let header_footer_line_count = 2
+  if a:0 == 1
+    let header_footer_line_count = a:1
+  endif
   if len(g:ripgrep_search_path) > 0
     let search_path = join(g:ripgrep_search_path,', ') 
   else
@@ -257,7 +261,7 @@ function! ripgrep#EchoResultMsg(header_footer_line_count)
  	redraw
 
   let qflist = getqflist()
- 	let qf_size = len(qflist) - a:header_footer_line_count
+ 	let qf_size = len(qflist) - header_footer_line_count
   if qf_size > 0
 	  echohl ModeMsg | echo 'vim-ripgrep: '.qf_size.' matches found in '.search_path | echohl None
 	  " so we get info about parsing errors...
@@ -344,7 +348,7 @@ augroup END
 " TODO RipGrep in path!
 if (exists(':AsyncRun'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrep
-	        \ call ripgrep#ExecCmd('AsyncRun'.<bang>.' -post=call\ ripgrep\#EchoResultMsg(2) -auto=grep -program=grep @ '.
+	        \ call ripgrep#ExecCmd('AsyncRun'.<bang>.' -post='.fnameescape('call g:ripgrep#EchoResultMsg( )').' -auto=grep -program=grep @ '.
           \ escape(ripgrep#GetParamsForCommand(<f-args>),'#%'))
 else
   command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
