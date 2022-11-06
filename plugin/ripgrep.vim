@@ -229,22 +229,32 @@ function! g:ripgrep#ExecRipGrep()
 	call ripgrep#ExecCmd(cmd)
 endfunction
 
-function! g:ripgrep#ExecCmd(command)
-  let tmp_list=[&shell, &shellquote, &shellpipe, &shellxquote, &shellcmdflag, &shellredir]
+function! g:ripgrep#SaveOpts()
+  let s:ripgrep_saved_shell_opts=[&shell, &shellquote, &shellpipe, &shellxquote, &shellcmdflag, &shellredir]
   " set back to default...
+  call ripgrep#echod('SaveOpts: '.join(s:ripgrep_saved_shell_opts, ','))
 	set shellquote& 
   set shellpipe&
   set shellxquote&
   set shellcmdflag&
   set shellredir&
   set shell&
+endfunction
+
+function! g:ripgrep#RestoreOpts()
+  call ripgrep#echod('RestoreOpts: '.join(s:ripgrep_saved_shell_opts, ','))
+  let &shell        = s:ripgrep_saved_shell_opts[0]
+  let &shellquote   = s:ripgrep_saved_shell_opts[1]
+  let &shellpipe    = s:ripgrep_saved_shell_opts[2]
+  let &shellxquote  = s:ripgrep_saved_shell_opts[3]
+  let &shellcmdflag = s:ripgrep_saved_shell_opts[4]
+  let &shellredir   = s:ripgrep_saved_shell_opts[5]
+endfunction
+
+function! g:ripgrep#ExecCmd(command)
+  call g:ripgrep#SaveOpts()
   execute a:command
-  let &shell        = tmp_list[0]
-  let &shellquote   = tmp_list[1]
-  let &shellpipe    = tmp_list[2]
-  let &shellxquote  = tmp_list[3]
-  let &shellcmdflag = tmp_list[4]
-  let &shellredir   = tmp_list[5]
+  call g:ripgrep#RestoreOpts()
 endfunction
 
 function! g:ripgrep#EchoResultMsg(...)
@@ -346,12 +356,14 @@ augroup END
 " ----------------------
 
 " TODO RipGrep in path!
-if (exists(':AsyncRun'))
+if (exists('*asyncrun#run'))
   command! -bang -nargs=+ -range=0 -complete=file RipGrep
-	        \ call ripgrep#ExecCmd('AsyncRun'.<bang>.' -post='.fnameescape('call g:ripgrep#EchoResultMsg( )').' -auto=grep -program=grep @ '.
-          \ escape(ripgrep#GetParamsForCommand(<f-args>),'#%'))
+        \ call ripgrep#SaveOpts()
+	      \| call asyncrun#run('<bang>', { 'post' : 'call g:ripgrep#EchoResultMsg()', 'auto' : 'grep', 'program':'grep'}, escape(ripgrep#GetParamsForCommand(<f-args>),'#%'))
+	      \| call ripgrep#RestoreOpts()
 else
-  command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrep(<f-args>)
+  command! -nargs=+ -complete=file RipGrep
+        \ call ripgrep#RipGrep(<f-args>)
 endif
 
 " ----------------------
