@@ -144,7 +144,7 @@ endfunction
 
 function! g:ripgrep#echod(msg)
   if exists('g:ripgrep_dbg') && g:ripgrep_dbg == 1
-    if exists(':Decho')
+    if exists('g:dechomode')
       call Decho(a:msg)
     else
       echom a:msg
@@ -253,6 +253,7 @@ endfunction
 
 function! g:ripgrep#ExecCmd(command)
   call g:ripgrep#SaveOpts()
+  call ripgrep#echod('ExecCmd: '.a:command)
   execute a:command
   call g:ripgrep#RestoreOpts()
 endfunction
@@ -357,9 +358,15 @@ augroup END
 
 " TODO RipGrep in path!
 if (exists('*asyncrun#run'))
+ "----------------------
+ " --- Test asyncrun:
+ ":set grepprg=rg\ --vimgrep
+ ":call asyncrun#run('<bang>', { 'post' : 'call g:ripgrep#EchoResultMsg()', 'program':'grep'}, '@-E latin1 -g *.pas "pattern" .')
+ "----------------------
   command! -bang -nargs=+ -range=0 -complete=file RipGrep
         \ call ripgrep#SaveOpts()
-	      \| call asyncrun#run('<bang>', { 'post' : 'call g:ripgrep#EchoResultMsg()', 'auto' : 'grep', 'program':'grep'}, escape(ripgrep#GetParamsForCommand(<f-args>),'#%'))
+        "\| call ripgrep#echod('RipGrep: '.escape(ripgrep#GetParamsForCommand(<f-args>),'#%'))
+	      \| call asyncrun#run('<bang>', { 'post' : 'call g:ripgrep#EchoResultMsg()', 'auto' : 'grep', 'program':'grep'}, '@'.escape(ripgrep#GetParamsForCommand(<f-args>),'#%'))
 	      \| call ripgrep#RestoreOpts()
 else
   command! -nargs=+ -complete=file RipGrep
