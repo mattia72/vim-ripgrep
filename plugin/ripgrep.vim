@@ -190,28 +190,28 @@ function! g:ripgrep#FillParameters(...)
   let is_path = 1
   call ripgrep#echod('ReadParams: '.string(a:000))
   while i >= 0
-    call ripgrep#echod('ReadParams param '.i.': '.a:000[i])
+    call ripgrep#echod('ReadParams: param '.i.': '.a:000[i])
     " if last parameter is a file/directory
 
     if is_path == 1 
       let file_or_dir = glob(expand(a:000[i]))
       if !empty(file_or_dir) && (isdirectory(file_or_dir) || filereadable(file_or_dir))
-        call ripgrep#echod('ReadParams param '.i.' is path:'.file_or_dir)
+        call ripgrep#echod('ReadParams: param '.i.' is path:'.file_or_dir)
         call insert(g:ripgrep_parameters, shellescape(a:000[i]))
         call insert(g:ripgrep_search_path, file_or_dir)
       else
         let is_path = 0
-        call ripgrep#echod('ReadParams param '.i.' is NOT path!')
+        call ripgrep#echod('ReadParams: param '.i.' is NOT path!')
         continue
       endif
     else " else search string
       if pattern_set == 0 
         let escaped = ripgrep#EscapeSearchPattern(a:000[i])
         call insert(g:ripgrep_parameters, g:ripgrep_search_pattern)
-        call ripgrep#echod('ReadParams param '.i.' is pattern:'.g:ripgrep_search_pattern)
+        call ripgrep#echod('ReadParams: param '.i.' is pattern:'.g:ripgrep_search_pattern)
         let pattern_set = 1
       else " else rg parameters
-        call ripgrep#echod('ReadParams param '.i.' is rg parameter:'.a:000[i])
+        call ripgrep#echod('ReadParams: param '.i.' is rg parameter:'.a:000[i])
         call insert(g:ripgrep_parameters, shellescape(trim(a:000[i],'"')))
       endif
       let is_path = 0
@@ -319,7 +319,7 @@ endfunction
 function! g:ripgrep#Path2Param()
   let arr = split(&path,',')
   if exists('g:ripgrep_search_path')
-    call g:ripgrep_search_path = g:ripgrep_search_path + arr) 
+    let g:ripgrep_search_path = g:ripgrep_search_path + arr 
   else
     let g:ripgrep_search_path = arr
   endif
@@ -356,6 +356,21 @@ augroup END
 " Commands
 " ----------------------
 
+function! g:ripgrep#RipGrepCmd(...) 
+  let params = call('g:ripgrep#GetParamsForCommand', a:000)
+  call ripgrep#echod('RipGrepCmd: params='.params)
+  call ripgrep#echod('RipGrepCmd: escaped(params)='.escape(params))
+  if (exists('*asyncrun#run'))
+    call ripgrep#echod('RipGrepCmd: async')
+    call ripgrep#SaveOpts()
+	  call asyncrun#run('<bang>', { 'post' : 'call g:ripgrep#EchoResultMsg()', 'auto' : 'grep', 'program':'grep'}, '@'.escape(call('g:ripgrep#GetParamsForCommand', a:000 + ['#%'])))
+	  call ripgrep#RestoreOpts()
+  else
+    call ripgrep#echod('RipGrepCmd: sync')
+    call call('ripgrep#RipGrep', a:000)
+  endif
+endfunction
+
 " TODO RipGrep in path!
 if (exists('*asyncrun#run'))
  "----------------------
@@ -373,6 +388,8 @@ else
         \ call ripgrep#RipGrep(<f-args>)
 endif
 
+command! -nargs=+ -complete=file RipGrepA call ripgrep#RipGrepCmd(<f-args>)
+
 " ----------------------
 " Mappings
 " ----------------------
@@ -380,6 +397,7 @@ endif
 if !exists('g:ripgrep_skip_mappings')
   " ripgrep word under cursor in current file
   nnoremap <leader>rw <ESC>:execute 'RipGrep -w '.ripgrep#EscapeSearchPattern('<C-R><C-W>').' %'<CR>
+  nnoremap <leader>ra <ESC>:execute 'RipGrepA -w '.ripgrep#EscapeSearchPattern('<C-R><C-W>').' %'<CR>
   " ripgrep word under cursor in current dir
   nnoremap <leader>rW <ESC>:execute 'RipGrep -w '.ripgrep#EscapeSearchPattern('<C-R><C-W>')<CR>
   " ripgrep selected in current file
