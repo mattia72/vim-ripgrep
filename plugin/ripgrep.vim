@@ -28,7 +28,7 @@
 
 scriptencoding utf-8
 
-let g:ripgrep_dbg = 0
+"let g:ripgrep_dbg = 0
 
 " Preprocessing
 if !exists('g:ripgrep_dbg') || g:ripgrep_dbg == 0
@@ -46,6 +46,13 @@ if (!executable('rg'))
 endif
 
 let g:loaded_vim_ripgrep = 1
+
+if exists('g:ripgrep_dbg') && g:ripgrep_dbg == 1
+  " to get messages in vsplit
+  nnoremap <buffer> <leader>vm :ls<cr>:vnew<bar>put =execute('messages')<cr>
+  " reloa plugin
+  nnoremap <buffer> <leader>rl :unlet g:loaded_vim_ripgrep<bar>so %<bar>echohl ModeMsg <bar> echo 'vim-ripgrep: reloaded.' <bar> echohl None<cr>
+endif
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -338,6 +345,20 @@ function! g:ripgrep#GetBuffers()
 	return buffs
 endfunction
 
+function! g:ripgrep#RipGrepCmd(...) 
+  let params = call('g:ripgrep#GetParamsForCommand', a:000)
+  call ripgrep#echod('RipGrepCmd: params='.params)
+  if (exists('*asyncrun#run'))
+    call ripgrep#echod('RipGrepCmd: async')
+    call ripgrep#SaveOpts()
+	  call asyncrun#run('<bang>', { 'post' : 'call g:ripgrep#EchoResultMsg()', 'auto' : 'grep', 'program':'grep'}, '@'.escape(params, '#%'))
+	  call ripgrep#RestoreOpts()
+  else
+    call ripgrep#echod('RipGrepCmd: sync')
+    call call('ripgrep#RipGrep', a:000)
+  endif
+endfunction
+
 " ----------------------
 " Autocommands
 " ----------------------
@@ -356,39 +377,14 @@ augroup END
 " Commands
 " ----------------------
 
-function! g:ripgrep#RipGrepCmd(...) 
-  let params = call('g:ripgrep#GetParamsForCommand', a:000)
-  call ripgrep#echod('RipGrepCmd: params='.params)
-  call ripgrep#echod('RipGrepCmd: escaped(params)='.escape(params))
-  if (exists('*asyncrun#run'))
-    call ripgrep#echod('RipGrepCmd: async')
-    call ripgrep#SaveOpts()
-	  call asyncrun#run('<bang>', { 'post' : 'call g:ripgrep#EchoResultMsg()', 'auto' : 'grep', 'program':'grep'}, '@'.escape(call('g:ripgrep#GetParamsForCommand', a:000 + ['#%'])))
-	  call ripgrep#RestoreOpts()
-  else
-    call ripgrep#echod('RipGrepCmd: sync')
-    call call('ripgrep#RipGrep', a:000)
-  endif
-endfunction
-
 " TODO RipGrep in path!
-if (exists('*asyncrun#run'))
  "----------------------
  " --- Test asyncrun:
  ":set grepprg=rg\ --vimgrep
  ":call asyncrun#run('<bang>', { 'post' : 'call g:ripgrep#EchoResultMsg()', 'program':'grep'}, '@-E latin1 -g *.pas "pattern" .')
  "----------------------
-  command! -bang -nargs=+ -range=0 -complete=file RipGrep
-        \ call ripgrep#SaveOpts()
-        "\| call ripgrep#echod('RipGrep: '.escape(ripgrep#GetParamsForCommand(<f-args>),'#%'))
-	      \| call asyncrun#run('<bang>', { 'post' : 'call g:ripgrep#EchoResultMsg()', 'auto' : 'grep', 'program':'grep'}, '@'.escape(ripgrep#GetParamsForCommand(<f-args>),'#%'))
-	      \| call ripgrep#RestoreOpts()
-else
-  command! -nargs=+ -complete=file RipGrep
-        \ call ripgrep#RipGrep(<f-args>)
-endif
 
-command! -nargs=+ -complete=file RipGrepA call ripgrep#RipGrepCmd(<f-args>)
+command! -nargs=+ -complete=file RipGrep call ripgrep#RipGrepCmd(<f-args>)
 
 " ----------------------
 " Mappings
